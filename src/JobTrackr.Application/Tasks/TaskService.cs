@@ -1,8 +1,6 @@
-﻿using JobTrackr.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobTrackr.Application.Tasks
@@ -10,10 +8,7 @@ namespace JobTrackr.Application.Tasks
     public class TaskService : ITaskService
     {
         private readonly List<TaskResponse> _tasks = [];
-
-
         private int _nextId = 1;
-
 
         public async Task<TaskResponse> CreateTask(CreateTaskRequest request)
         {
@@ -21,6 +16,7 @@ namespace JobTrackr.Application.Tasks
             {
                 throw new ArgumentException("Task title is required.");
             }
+
             TaskResponse response = new TaskResponse()
             {
                 Id = _nextId,
@@ -29,23 +25,48 @@ namespace JobTrackr.Application.Tasks
                 CreatedAtUtc = DateTime.UtcNow,
                 IsCompleted = false
             };
+
             _nextId += 1;
             _tasks.Add(response);
             await Task.Yield();
+
             return response;
         }
 
         public async Task<List<TaskResponse>> GetAll()
         {
             await Task.Yield();
+
             return _tasks.ToList();
         }
 
         public async Task<TaskResponse?> GetById(int id)
         {
             await Task.Yield();
-           return _tasks.Find(x => x.Id == id);
-            
+
+            return _tasks.Find(x => x.Id == id);
+        }
+
+        public async Task<TaskResponse?> UpdateTask(int id, UpdateTaskRequest request)
+        {
+            await Task.Yield();
+
+            var task = _tasks.Find(x => x.Id == id);
+
+            if (task is null)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Title))
+            {
+                throw new ArgumentException("Task title is required.");
+            }
+
+            task.Title = request.Title;
+            task.Description = request.Description;
+
+            return task;
         }
     }
 }
