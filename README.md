@@ -16,6 +16,7 @@ Completed so far:
 - Added task create endpoint
 - Added get all tasks endpoint
 - Added get task by id endpoint
+- Added update task endpoint
 - Added basic task title validation
 - Removed default WeatherForecast API
 
@@ -50,7 +51,16 @@ Reserved for database and external system code later.
 GET /api/tasks
 POST /api/tasks
 GET /api/tasks/{id}
+PUT /api/tasks/{id}
 ```
+
+Current behavior:
+
+- `POST /api/tasks` creates a task.
+- `GET /api/tasks` returns all tasks.
+- `GET /api/tasks/{id}` returns one task or `404 Not Found`.
+- `PUT /api/tasks/{id}` updates task title and description.
+- Empty task title returns `400 Bad Request`.
 
 ## Run The Project
 
@@ -82,7 +92,6 @@ This project is part of a long-term backend engineering journey focused on:
 
 Planned future work:
 
-- update task endpoint
 - delete task endpoint
 - SQL Server persistence
 - Entity Framework Core
