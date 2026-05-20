@@ -17,6 +17,7 @@ Completed so far:
 - Added get all tasks endpoint
 - Added get task by id endpoint
 - Added update task endpoint
+- Added delete task endpoint
 - Added basic task title validation
 - Removed default WeatherForecast API
 
@@ -52,6 +53,7 @@ GET /api/tasks
 POST /api/tasks
 GET /api/tasks/{id}
 PUT /api/tasks/{id}
+DELETE /api/tasks/{id}
 ```
 
 Current behavior:
@@ -60,6 +62,7 @@ Current behavior:
 - `GET /api/tasks` returns all tasks.
 - `GET /api/tasks/{id}` returns one task or `404 Not Found`.
 - `PUT /api/tasks/{id}` updates task title and description.
+- `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.
 - Empty task title returns `400 Bad Request`.
 
 ## Run The Project
@@ -92,7 +95,6 @@ This project is part of a long-term backend engineering journey focused on:
 
 Planned future work:
 
-- delete task endpoint
 - SQL Server persistence
 - Entity Framework Core
 - authentication
