@@ -26,14 +26,14 @@ namespace JobTrackr.Application.Tasks
                 IsCompleted = false
             };
 
-            _nextId += 1;
-            _tasks.Add(response);
-            await Task.Yield();
+        _nextId += 1;
+        _tasks.Add(response);
+        await Task.Yield();
 
-            return response;
-        }
+        return response;
+    }
 
-        public async Task<List<TaskResponse>> GetAll()
+    public async Task<List<TaskResponse>> GetAll()
         {
             await Task.Yield();
 
@@ -68,5 +68,21 @@ namespace JobTrackr.Application.Tasks
 
             return task;
         }
+
+        public async Task<bool> DeleteTask(int id)
+        {
+            await Task.Yield();
+
+        var task = _tasks.Find(x => x.Id == id);
+
+        if (task is null)
+        {
+            return false;
+        }
+
+        _tasks.Remove(task);
+
+        return true;
     }
+}
 }
