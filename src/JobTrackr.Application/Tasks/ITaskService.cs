@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace JobTrackr.Application.Tasks
 {
     public interface ITaskService

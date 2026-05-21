@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace JobTrackr.Application.Tasks
 {
     public class TaskService : ITaskService
@@ -26,14 +21,14 @@ namespace JobTrackr.Application.Tasks
                 IsCompleted = false
             };
 
-        _nextId += 1;
-        _tasks.Add(response);
-        await Task.Yield();
+            _nextId += 1;
+            _tasks.Add(response);
+            await Task.Yield();
 
-        return response;
-    }
+            return response;
+        }
 
-    public async Task<List<TaskResponse>> GetAll()
+        public async Task<List<TaskResponse>> GetAll()
         {
             await Task.Yield();
 
@@ -73,16 +68,16 @@ namespace JobTrackr.Application.Tasks
         {
             await Task.Yield();
 
-        var task = _tasks.Find(x => x.Id == id);
+            var task = _tasks.Find(x => x.Id == id);
 
-        if (task is null)
-        {
-            return false;
+            if (task is null)
+            {
+                return false;
+            }
+
+            _tasks.Remove(task);
+
+            return true;
         }
-
-        _tasks.Remove(task);
-
-        return true;
     }
-}
 }

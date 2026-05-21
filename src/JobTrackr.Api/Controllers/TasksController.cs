@@ -70,17 +70,17 @@ namespace JobTrackr.Api.Controllers
             }
         }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var isDeleted = await _taskService.DeleteTask(id);
-
-        if (!isDeleted)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return NotFound("Task is not found");
-        }
+            var isDeleted = await _taskService.DeleteTask(id);
 
-        return NoContent();
+            if (!isDeleted)
+            {
+                return NotFound("Task is not found");
+            }
+
+            return NoContent();
+        }
     }
-}
 }
