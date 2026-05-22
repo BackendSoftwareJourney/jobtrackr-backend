@@ -58,7 +58,7 @@ DELETE /api/tasks/{id}
 
 Current behavior:
 
-- `POST /api/tasks` creates a task.
+- `POST /api/tasks` creates a task and returns `201 Created`.
 - `GET /api/tasks` returns all tasks.
 - `GET /api/tasks/{id}` returns one task or `404 Not Found`.
 - `PUT /api/tasks/{id}` updates task title and description.

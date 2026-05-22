@@ -29,7 +29,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound("Task is not found");
+                return NotFound("Task not found.");
             }
 
             return Ok(response);
@@ -42,7 +42,8 @@ namespace JobTrackr.Api.Controllers
             {
                 var response = await _taskService.CreateTask(request);
 
-                return Ok(response);
+
+                return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -59,7 +60,7 @@ namespace JobTrackr.Api.Controllers
 
                 if (response is null)
                 {
-                    return NotFound("Task is not found");
+                    return NotFound("Task not found.");
                 }
 
                 return Ok(response);
@@ -77,7 +78,7 @@ namespace JobTrackr.Api.Controllers
 
             if (!isDeleted)
             {
-                return NotFound("Task is not found");
+                return NotFound("Task not found.");
             }
 
             return NoContent();
