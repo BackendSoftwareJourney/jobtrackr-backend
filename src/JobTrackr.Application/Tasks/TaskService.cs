@@ -79,5 +79,21 @@ namespace JobTrackr.Application.Tasks
 
             return true;
         }
+
+        public async Task<TaskResponse?> CompleteTask(int id)
+        {
+            await Task.Yield();
+
+            var task = _tasks.Find(x => x.Id == id);
+
+            if (task is null)
+            {
+                return null;
+            }
+
+            task.IsCompleted = true;
+
+            return task;
+        }
     }
 }

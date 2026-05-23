@@ -11,5 +11,7 @@ namespace JobTrackr.Application.Tasks
         Task<TaskResponse?> UpdateTask(int id, UpdateTaskRequest request);
 
         Task<bool> DeleteTask(int id);
+
+        Task<TaskResponse?> CompleteTask(int id);
     }
 }

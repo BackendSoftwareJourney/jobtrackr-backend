@@ -83,5 +83,17 @@ namespace JobTrackr.Api.Controllers
 
             return NoContent();
         }
+        [HttpPatch("{id}/complete")]
+        public async Task<IActionResult> Complete(int id)
+        {
+            var response = await _taskService.CompleteTask(id);
+
+            if (response is null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            return Ok(response);
+        }
     }
 }
