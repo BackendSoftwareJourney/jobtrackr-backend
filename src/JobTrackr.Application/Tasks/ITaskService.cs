@@ -13,5 +13,7 @@ namespace JobTrackr.Application.Tasks
         Task<bool> DeleteTask(int id);
 
         Task<TaskResponse?> CompleteTask(int id);
+
+        Task<TaskResponse?> ReopenTask(int id);
     }
 }

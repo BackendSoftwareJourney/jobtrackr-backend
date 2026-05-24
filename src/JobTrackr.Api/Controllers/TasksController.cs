@@ -42,7 +42,6 @@ namespace JobTrackr.Api.Controllers
             {
                 var response = await _taskService.CreateTask(request);
 
-
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
             catch (ArgumentException ex)
@@ -83,10 +82,24 @@ namespace JobTrackr.Api.Controllers
 
             return NoContent();
         }
+
         [HttpPatch("{id}/complete")]
         public async Task<IActionResult> Complete(int id)
         {
             var response = await _taskService.CompleteTask(id);
+
+            if (response is null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/reopen")]
+        public async Task<IActionResult> Reopen(int id)
+        {
+            var response = await _taskService.ReopenTask(id);
 
             if (response is null)
             {
