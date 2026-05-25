@@ -2,7 +2,7 @@ namespace JobTrackr.Application.Tasks
 {
     public interface ITaskService
     {
-        Task<List<TaskResponse>> GetAll();
+        Task<List<TaskResponse>> GetAll(bool? isCompleted);
 
         Task<TaskResponse?> GetById(int id);
 

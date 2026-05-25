@@ -52,6 +52,8 @@ Reserved for database and external system code later.
 
 ```http
 GET /api/tasks
+GET /api/tasks?isCompleted=true
+GET /api/tasks?isCompleted=false
 POST /api/tasks
 GET /api/tasks/{id}
 PUT /api/tasks/{id}
@@ -63,7 +65,9 @@ PATCH /api/tasks/{id}/reopen
 Current behavior:
 
 - `POST /api/tasks` creates a task and returns `201 Created`.
-- `GET /api/tasks` returns all tasks.
+- `GET /api/tasks` returns all tasks and can optionally filter by completion status.
+- `GET /api/tasks?isCompleted=true` returns completed tasks.
+- `GET /api/tasks?isCompleted=false` returns incomplete tasks.
 - `GET /api/tasks/{id}` returns one task or `404 Not Found`.
 - `PUT /api/tasks/{id}` updates task title and description.
 - `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.

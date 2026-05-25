@@ -15,9 +15,9 @@ namespace JobTrackr.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(bool? isCompleted)
         {
-            var tasks = await _taskService.GetAll();
+            var tasks = await _taskService.GetAll(isCompleted);
 
             return Ok(tasks);
         }

@@ -28,11 +28,18 @@ namespace JobTrackr.Application.Tasks
             return response;
         }
 
-        public async Task<List<TaskResponse>> GetAll()
+        public async Task<List<TaskResponse>> GetAll(bool? isCompleted)
         {
             await Task.Yield();
 
-            return _tasks.ToList();
+            if (isCompleted is null)
+            {
+                return _tasks.ToList();
+            }
+
+            return _tasks
+                .Where(task => task.IsCompleted == isCompleted)
+                .ToList();
         }
 
         public async Task<TaskResponse?> GetById(int id)
