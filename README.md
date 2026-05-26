@@ -54,6 +54,8 @@ Reserved for database and external system code later.
 GET /api/tasks
 GET /api/tasks?isCompleted=true
 GET /api/tasks?isCompleted=false
+GET /api/tasks?search=resume
+GET /api/tasks?isCompleted=true&search=resume
 POST /api/tasks
 GET /api/tasks/{id}
 PUT /api/tasks/{id}
@@ -68,6 +70,8 @@ Current behavior:
 - `GET /api/tasks` returns all tasks and can optionally filter by completion status.
 - `GET /api/tasks?isCompleted=true` returns completed tasks.
 - `GET /api/tasks?isCompleted=false` returns incomplete tasks.
+- `GET /api/tasks?search=resume` searches tasks by title.
+- `GET /api/tasks?isCompleted=true&search=resume` combines completion filtering and title search.
 - `GET /api/tasks/{id}` returns one task or `404 Not Found`.
 - `PUT /api/tasks/{id}` updates task title and description.
 - `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.

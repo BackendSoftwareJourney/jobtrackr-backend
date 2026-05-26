@@ -28,18 +28,23 @@ namespace JobTrackr.Application.Tasks
             return response;
         }
 
-        public async Task<List<TaskResponse>> GetAll(bool? isCompleted)
+        public async Task<List<TaskResponse>> GetAll(bool? isCompleted, string? search)
         {
             await Task.Yield();
 
-            if (isCompleted is null)
+            var query = _tasks.AsEnumerable();
+
+            if (isCompleted is not null)
             {
-                return _tasks.ToList();
+                query = query.Where(x => x.IsCompleted == isCompleted);
             }
 
-            return _tasks
-                .Where(task => task.IsCompleted == isCompleted)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(x => x.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return query.ToList();
         }
 
         public async Task<TaskResponse?> GetById(int id)
