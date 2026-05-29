@@ -20,6 +20,8 @@ Completed so far:
 - Added delete task endpoint
 - Added complete task endpoint
 - Added reopen task endpoint
+- Added user create endpoint
+- Added get all users endpoint
 - Added basic task title validation
 - Removed default WeatherForecast API
 
@@ -62,6 +64,8 @@ PUT /api/tasks/{id}
 DELETE /api/tasks/{id}
 PATCH /api/tasks/{id}/complete
 PATCH /api/tasks/{id}/reopen
+GET /api/users
+POST /api/users
 ```
 
 Current behavior:
@@ -77,6 +81,8 @@ Current behavior:
 - `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.
 - `PATCH /api/tasks/{id}/complete` marks a task as completed.
 - `PATCH /api/tasks/{id}/reopen` marks a completed task as not completed.
+- `GET /api/users` returns all users.
+- `POST /api/users` creates a user.
 - Empty task title returns `400 Bad Request`.
 
 ## Run The Project
