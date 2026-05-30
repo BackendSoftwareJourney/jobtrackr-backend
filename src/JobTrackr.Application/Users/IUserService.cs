@@ -5,5 +5,7 @@ namespace JobTrackr.Application.Users
         Task<UserResponse> CreateUser(CreateUserRequest request);
 
         Task<List<UserResponse>> GetAll();
+
+        Task<UserResponse?> GetById(int id);
     }
 }

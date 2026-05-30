@@ -38,5 +38,12 @@ namespace JobTrackr.Application.Users
 
             return _users.ToList();
         }
+
+        public async Task<UserResponse?> GetById(int id)
+        {
+            await Task.Yield();
+
+            return _users.Find(user => user.Id == id);
+        }
     }
 }

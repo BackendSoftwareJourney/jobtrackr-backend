@@ -22,6 +22,7 @@ Completed so far:
 - Added reopen task endpoint
 - Added user create endpoint
 - Added get all users endpoint
+- Added get user by id endpoint
 - Added basic task title validation
 - Removed default WeatherForecast API
 
@@ -66,6 +67,7 @@ PATCH /api/tasks/{id}/complete
 PATCH /api/tasks/{id}/reopen
 GET /api/users
 POST /api/users
+GET /api/users/{id}
 ```
 
 Current behavior:
@@ -83,6 +85,7 @@ Current behavior:
 - `PATCH /api/tasks/{id}/reopen` marks a completed task as not completed.
 - `GET /api/users` returns all users.
 - `POST /api/users` creates a user.
+- `GET /api/users/{id}` returns one user or `404 Not Found`.
 - Empty task title returns `400 Bad Request`.
 
 ## Run The Project

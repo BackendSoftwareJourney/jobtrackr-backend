@@ -22,6 +22,19 @@ namespace JobTrackr.Api.Controllers
             return Ok(users);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var user = await _userService.GetById(id);
+
+            if (user is null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(user);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserRequest request)
         {
