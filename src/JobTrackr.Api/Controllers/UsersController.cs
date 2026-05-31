@@ -49,5 +49,25 @@ namespace JobTrackr.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateUserRequest request)
+        {
+            try
+            {
+                var response = await _userService.UpdateUser(id, request);
+
+                if (response is null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

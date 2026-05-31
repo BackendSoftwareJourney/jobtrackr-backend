@@ -7,5 +7,7 @@ namespace JobTrackr.Application.Users
         Task<List<UserResponse>> GetAll();
 
         Task<UserResponse?> GetById(int id);
+
+        Task<UserResponse?> UpdateUser(int id, UpdateUserRequest request);
     }
 }

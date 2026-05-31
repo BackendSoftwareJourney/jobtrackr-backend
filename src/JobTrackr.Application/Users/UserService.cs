@@ -45,5 +45,32 @@ namespace JobTrackr.Application.Users
 
             return _users.Find(user => user.Id == id);
         }
+
+        public async Task<UserResponse?> UpdateUser(int id, UpdateUserRequest request)
+        {
+            await Task.Yield();
+
+            if (string.IsNullOrWhiteSpace(request.FullName))
+            {
+                throw new ArgumentException("User full name is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                throw new ArgumentException("User email is required.");
+            }
+
+            var user = _users.Find(user => user.Id == id);
+
+            if (user is null)
+            {
+                return null;
+            }
+
+            user.Email = request.Email;
+            user.FullName = request.FullName;
+
+            return user;
+        }
     }
 }
