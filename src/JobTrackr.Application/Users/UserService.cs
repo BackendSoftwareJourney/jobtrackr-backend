@@ -72,5 +72,21 @@ namespace JobTrackr.Application.Users
 
             return user;
         }
+
+        public async Task<bool> DeleteUser(int id)
+        {
+            await Task.Yield();
+
+            var user = _users.Find(user => user.Id == id);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            _users.Remove(user);
+
+            return true;
+        }
     }
 }

@@ -9,5 +9,7 @@ namespace JobTrackr.Application.Users
         Task<UserResponse?> GetById(int id);
 
         Task<UserResponse?> UpdateUser(int id, UpdateUserRequest request);
+
+        Task<bool> DeleteUser(int id);
     }
 }

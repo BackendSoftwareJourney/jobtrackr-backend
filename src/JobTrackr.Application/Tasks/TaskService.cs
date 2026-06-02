@@ -1,12 +1,32 @@
+using JobTrackr.Application.Users;
+
 namespace JobTrackr.Application.Tasks
 {
     public class TaskService : ITaskService
     {
         private readonly List<TaskResponse> _tasks = [];
         private int _nextId = 1;
+        private readonly IUserService _userService;
+
+        public TaskService(IUserService userService)
+        {
+            _userService = userService;
+        }
 
         public async Task<TaskResponse> CreateTask(CreateTaskRequest request)
         {
+            if (request.UserId <= 0)
+            {
+                throw new ArgumentException("UserId is required.");
+            }
+
+            var user = await _userService.GetById(request.UserId);
+
+            if (user is null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
             if (string.IsNullOrWhiteSpace(request.Title))
             {
                 throw new ArgumentException("Task title is required.");
@@ -18,7 +38,8 @@ namespace JobTrackr.Application.Tasks
                 Description = request.Description,
                 Title = request.Title,
                 CreatedAtUtc = DateTime.UtcNow,
-                IsCompleted = false
+                IsCompleted = false,
+                UserId = request.UserId
             };
 
             _nextId += 1;

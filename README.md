@@ -24,6 +24,8 @@ Completed so far:
 - Added get all users endpoint
 - Added get user by id endpoint
 - Added update user endpoint
+- Added delete user endpoint
+- Connected tasks to users with `UserId`
 - Added basic task title validation
 - Removed default WeatherForecast API
 
@@ -70,11 +72,12 @@ GET /api/users
 POST /api/users
 GET /api/users/{id}
 PUT /api/users/{id}
+DELETE /api/users/{id}
 ```
 
 Current behavior:
 
-- `POST /api/tasks` creates a task and returns `201 Created`.
+- `POST /api/tasks` requires `UserId`, creates a task for an existing user, and returns `201 Created`.
 - `GET /api/tasks` returns all tasks and can optionally filter by completion status.
 - `GET /api/tasks?isCompleted=true` returns completed tasks.
 - `GET /api/tasks?isCompleted=false` returns incomplete tasks.
@@ -89,6 +92,8 @@ Current behavior:
 - `POST /api/users` creates a user.
 - `GET /api/users/{id}` returns one user or `404 Not Found`.
 - `PUT /api/users/{id}` updates user full name and email.
+- `DELETE /api/users/{id}` deletes a user or returns `404 Not Found`.
+- Creating a task with a missing user returns `400 Bad Request`.
 - Empty task title returns `400 Bad Request`.
 
 ## Run The Project

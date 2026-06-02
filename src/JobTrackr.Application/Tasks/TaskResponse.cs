@@ -1,6 +1,6 @@
 ﻿namespace JobTrackr.Application.Tasks
 {
-    public  class TaskResponse
+    public class TaskResponse
     {
         public int Id { get; set; }
 
@@ -8,10 +8,10 @@
 
         public string Description { get; set; } = string.Empty;
 
-        public bool IsCompleted     { get; set; }
+        public bool IsCompleted { get; set; }
 
         public DateTime CreatedAtUtc { get; set; }
 
-
+        public int UserId { get; set; }
     }
 }
