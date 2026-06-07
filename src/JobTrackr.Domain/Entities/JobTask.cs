@@ -11,5 +11,7 @@ namespace JobTrackr.Domain.Entities
         public bool IsCompleted { get; set; }
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+        public int UserId { get; set; }
     }
 }

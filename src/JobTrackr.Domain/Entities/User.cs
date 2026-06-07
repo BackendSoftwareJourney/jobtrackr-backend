@@ -2,14 +2,6 @@
 {
     public class User
     {
-        /*
-         * - `Id`
-- `FullName`
-- `Email`
-- `CreatedAtUtc`
-         * 
-         * */
-
         public int Id { get; set; }
 
         public string FullName { get; set; } = string.Empty;
