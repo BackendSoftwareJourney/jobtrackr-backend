@@ -1,6 +1,7 @@
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using JobTrackr.Infrastructure.Persistence;
+using JobTrackr.Infrastructure.Tasks;
 using JobTrackr.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 
