@@ -1,3 +1,4 @@
+using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace JobTrackr.Api.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITaskService _taskService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ITaskService taskService)
         {
             _userService = userService;
+            _taskService = taskService;
         }
 
         [HttpGet]
@@ -33,6 +36,19 @@ namespace JobTrackr.Api.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpGet("{userId}/tasks")]
+        public async Task<IActionResult> GetTasksByUserId(int userId)
+        {
+            var tasks = await _taskService.GetByUserId(userId);
+
+            if (tasks is null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(tasks);
         }
 
         [HttpPost]

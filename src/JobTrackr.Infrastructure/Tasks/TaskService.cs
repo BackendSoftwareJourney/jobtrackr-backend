@@ -168,5 +168,20 @@ namespace JobTrackr.Infrastructure.Tasks
                 UserId = task.UserId
             };
         }
+
+        public async Task<List<TaskResponse>?> GetByUserId(int userId)
+        {
+            var userExists = await _dbContext.Users.AnyAsync(user => user.Id == userId);
+
+            if (!userExists)
+            {
+                return null;
+            }
+
+            return await _dbContext.Tasks
+                .Where(task => task.UserId == userId)
+                .Select(task => MapToResponse(task))
+                .ToListAsync();
+        }
     }
 }

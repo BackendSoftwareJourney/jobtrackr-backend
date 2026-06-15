@@ -15,5 +15,7 @@ namespace JobTrackr.Application.Tasks
         Task<TaskResponse?> CompleteTask(int id);
 
         Task<TaskResponse?> ReopenTask(int id);
+
+        Task<List<TaskResponse>?> GetByUserId(int userId);
     }
 }
