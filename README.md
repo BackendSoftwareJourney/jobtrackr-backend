@@ -28,6 +28,12 @@ Completed so far:
 - Connected tasks to users with `UserId`
 - Added basic task title validation
 - Removed default WeatherForecast API
+- Added Entity Framework Core
+- Added SQL Server persistence
+- Added database-backed user service
+- Added database-backed task service
+- Added explicit task-user relationship in EF Core
+- Added endpoint to get tasks for one user
 
 ## Architecture
 
@@ -44,7 +50,7 @@ Contains API controllers and application startup configuration.
 
 ### JobTrackr.Application
 
-Contains DTOs, service interfaces, and application use-case logic.
+Contains DTOs and service interfaces.
 
 ### JobTrackr.Domain
 
@@ -52,11 +58,17 @@ Contains core business entities.
 
 ### JobTrackr.Infrastructure
 
-Reserved for database and external system code later.
+Contains EF Core database context, migrations, and database-backed service implementations.
 
 ## Current Endpoints
 
 ```http
+GET /api/users
+POST /api/users
+GET /api/users/{id}
+GET /api/users/{userId}/tasks
+PUT /api/users/{id}
+DELETE /api/users/{id}
 GET /api/tasks
 GET /api/tasks?isCompleted=true
 GET /api/tasks?isCompleted=false
@@ -68,15 +80,16 @@ PUT /api/tasks/{id}
 DELETE /api/tasks/{id}
 PATCH /api/tasks/{id}/complete
 PATCH /api/tasks/{id}/reopen
-GET /api/users
-POST /api/users
-GET /api/users/{id}
-PUT /api/users/{id}
-DELETE /api/users/{id}
 ```
 
 Current behavior:
 
+- `GET /api/users` returns all users from SQL Server.
+- `POST /api/users` creates a user in SQL Server.
+- `GET /api/users/{id}` returns one user or `404 Not Found`.
+- `GET /api/users/{userId}/tasks` returns tasks for one user, returns an empty list if the user has no tasks, and returns `404 Not Found` if the user does not exist.
+- `PUT /api/users/{id}` updates user full name and email.
+- `DELETE /api/users/{id}` deletes a user or returns `404 Not Found`.
 - `POST /api/tasks` requires `UserId`, creates a task for an existing user, and returns `201 Created`.
 - `GET /api/tasks` returns all tasks and can optionally filter by completion status.
 - `GET /api/tasks?isCompleted=true` returns completed tasks.
@@ -88,13 +101,21 @@ Current behavior:
 - `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.
 - `PATCH /api/tasks/{id}/complete` marks a task as completed.
 - `PATCH /api/tasks/{id}/reopen` marks a completed task as not completed.
-- `GET /api/users` returns all users.
-- `POST /api/users` creates a user.
-- `GET /api/users/{id}` returns one user or `404 Not Found`.
-- `PUT /api/users/{id}` updates user full name and email.
-- `DELETE /api/users/{id}` deletes a user or returns `404 Not Found`.
 - Creating a task with a missing user returns `400 Bad Request`.
 - Empty task title returns `400 Bad Request`.
+
+## Database
+
+JobTrackr uses SQL Server with Entity Framework Core.
+
+Current database features:
+
+- `AppDbContext`
+- EF Core migrations
+- `Users` table
+- `Tasks` table
+- foreign key relationship from `Tasks.UserId` to `Users.Id`
+- cascade delete from user to that user's tasks
 
 ## Run The Project
 
@@ -126,8 +147,10 @@ This project is part of a long-term backend engineering journey focused on:
 
 Planned future work:
 
-- SQL Server persistence
-- Entity Framework Core
+- better task query options
+- due dates and task priority
+- stronger validation
+- better error handling
 - authentication
 - unit tests
 - deployment basics
