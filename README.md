@@ -34,6 +34,7 @@ Completed so far:
 - Added database-backed task service
 - Added explicit task-user relationship in EF Core
 - Added endpoint to get tasks for one user
+- Added `userId` filtering to the task list endpoint
 
 ## Architecture
 
@@ -73,7 +74,9 @@ GET /api/tasks
 GET /api/tasks?isCompleted=true
 GET /api/tasks?isCompleted=false
 GET /api/tasks?search=resume
+GET /api/tasks?userId=1
 GET /api/tasks?isCompleted=true&search=resume
+GET /api/tasks?userId=1&isCompleted=false&search=resume
 POST /api/tasks
 GET /api/tasks/{id}
 PUT /api/tasks/{id}
@@ -95,7 +98,9 @@ Current behavior:
 - `GET /api/tasks?isCompleted=true` returns completed tasks.
 - `GET /api/tasks?isCompleted=false` returns incomplete tasks.
 - `GET /api/tasks?search=resume` searches tasks by title.
+- `GET /api/tasks?userId=1` returns tasks for one user.
 - `GET /api/tasks?isCompleted=true&search=resume` combines completion filtering and title search.
+- `GET /api/tasks?userId=1&isCompleted=false&search=resume` combines user, completion, and title filters.
 - `GET /api/tasks/{id}` returns one task or `404 Not Found`.
 - `PUT /api/tasks/{id}` updates task title and description.
 - `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.

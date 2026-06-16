@@ -48,7 +48,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<List<TaskResponse>> GetAll(bool? isCompleted, string? search)
+        public async Task<List<TaskResponse>> GetAll(bool? isCompleted, string? search, int? userId)
         {
             var query = _dbContext.Tasks.AsQueryable();
 
@@ -60,6 +60,11 @@ namespace JobTrackr.Infrastructure.Tasks
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(task => task.Title.Contains(search));
+            }
+
+            if (userId is not null)
+            {
+                query = query.Where(task => task.UserId == userId);
             }
 
             return await query
