@@ -35,6 +35,7 @@ Completed so far:
 - Added explicit task-user relationship in EF Core
 - Added endpoint to get tasks for one user
 - Added `userId` filtering to the task list endpoint
+- Added optional task due date
 
 ## Architecture
 
@@ -94,6 +95,7 @@ Current behavior:
 - `PUT /api/users/{id}` updates user full name and email.
 - `DELETE /api/users/{id}` deletes a user or returns `404 Not Found`.
 - `POST /api/tasks` requires `UserId`, creates a task for an existing user, and returns `201 Created`.
+- Tasks can optionally have `DueDateUtc`.
 - `GET /api/tasks` returns all tasks and can optionally filter by completion status.
 - `GET /api/tasks?isCompleted=true` returns completed tasks.
 - `GET /api/tasks?isCompleted=false` returns incomplete tasks.
@@ -119,6 +121,7 @@ Current database features:
 - EF Core migrations
 - `Users` table
 - `Tasks` table
+- nullable `DueDateUtc` column on tasks
 - foreign key relationship from `Tasks.UserId` to `Users.Id`
 - cascade delete from user to that user's tasks
 
@@ -153,7 +156,7 @@ This project is part of a long-term backend engineering journey focused on:
 Planned future work:
 
 - better task query options
-- due dates and task priority
+- task priority
 - stronger validation
 - better error handling
 - authentication

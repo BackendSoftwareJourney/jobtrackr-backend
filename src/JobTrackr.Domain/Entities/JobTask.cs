@@ -12,6 +12,8 @@ namespace JobTrackr.Domain.Entities
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
+        public DateTime? DueDateUtc { get; set; }
+
         public int UserId { get; set; }
 
         public User? User { get; set; }

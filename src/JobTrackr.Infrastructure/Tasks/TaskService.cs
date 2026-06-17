@@ -38,6 +38,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 Description = request.Description,
                 Title = request.Title,
                 CreatedAtUtc = DateTime.UtcNow,
+                DueDateUtc = request.DueDateUtc,
                 IsCompleted = false,
                 UserId = request.UserId
             };
@@ -74,6 +75,7 @@ namespace JobTrackr.Infrastructure.Tasks
                     Description = task.Description,
                     Title = task.Title,
                     CreatedAtUtc = task.CreatedAtUtc,
+                    DueDateUtc = task.DueDateUtc,
                     IsCompleted = task.IsCompleted,
                     UserId = task.UserId
                 })
@@ -108,6 +110,7 @@ namespace JobTrackr.Infrastructure.Tasks
 
             task.Title = request.Title;
             task.Description = request.Description;
+            task.DueDateUtc = request.DueDateUtc;
 
             await _dbContext.SaveChangesAsync();
 
@@ -169,6 +172,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 Description = task.Description,
                 Title = task.Title,
                 CreatedAtUtc = task.CreatedAtUtc,
+                DueDateUtc = task.DueDateUtc,
                 IsCompleted = task.IsCompleted,
                 UserId = task.UserId
             };

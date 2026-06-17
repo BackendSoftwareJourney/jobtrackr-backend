@@ -12,6 +12,8 @@
 
         public DateTime CreatedAtUtc { get; set; }
 
+        public DateTime? DueDateUtc { get; set; }
+
         public int UserId { get; set; }
     }
 }
