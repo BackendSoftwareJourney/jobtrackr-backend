@@ -33,12 +33,18 @@ namespace JobTrackr.Infrastructure.Tasks
                 throw new ArgumentException("Task title is required.");
             }
 
+            if (string.IsNullOrWhiteSpace(request.Priority))
+            {
+                throw new ArgumentException("Task priority is required.");
+            }
+
             var task = new JobTask()
             {
                 Description = request.Description,
                 Title = request.Title,
                 CreatedAtUtc = DateTime.UtcNow,
                 DueDateUtc = request.DueDateUtc,
+                Priority = request.Priority,
                 IsCompleted = false,
                 UserId = request.UserId
             };
@@ -76,6 +82,7 @@ namespace JobTrackr.Infrastructure.Tasks
                     Title = task.Title,
                     CreatedAtUtc = task.CreatedAtUtc,
                     DueDateUtc = task.DueDateUtc,
+                    Priority = task.Priority,
                     IsCompleted = task.IsCompleted,
                     UserId = task.UserId
                 })
@@ -108,9 +115,15 @@ namespace JobTrackr.Infrastructure.Tasks
                 throw new ArgumentException("Task title is required.");
             }
 
+            if (string.IsNullOrWhiteSpace(request.Priority))
+            {
+                throw new ArgumentException("Task priority is required.");
+            }
+
             task.Title = request.Title;
             task.Description = request.Description;
             task.DueDateUtc = request.DueDateUtc;
+            task.Priority = request.Priority;
 
             await _dbContext.SaveChangesAsync();
 
@@ -173,6 +186,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 Title = task.Title,
                 CreatedAtUtc = task.CreatedAtUtc,
                 DueDateUtc = task.DueDateUtc,
+                Priority = task.Priority,
                 IsCompleted = task.IsCompleted,
                 UserId = task.UserId
             };

@@ -14,6 +14,8 @@ namespace JobTrackr.Domain.Entities
 
         public DateTime? DueDateUtc { get; set; }
 
+        public string Priority { get; set; } = "Medium";
+
         public int UserId { get; set; }
 
         public User? User { get; set; }

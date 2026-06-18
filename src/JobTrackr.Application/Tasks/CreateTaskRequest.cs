@@ -8,6 +8,8 @@
 
         public DateTime? DueDateUtc { get; set; }
 
+        public string Priority { get; set; } = "Medium";
+
         public int UserId { get; set; }
     }
 }
