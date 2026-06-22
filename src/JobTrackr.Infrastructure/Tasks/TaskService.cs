@@ -1,3 +1,4 @@
+using JobTrackr.Application.Common;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Domain.Entities;
 using JobTrackr.Infrastructure.Persistence;
@@ -18,24 +19,24 @@ namespace JobTrackr.Infrastructure.Tasks
         {
             if (request.UserId <= 0)
             {
-                throw new ArgumentException("UserId is required.");
+                throw new ArgumentException(ErrorMessages.UserIdRequired);
             }
 
             var userExists = await _dbContext.Users.AnyAsync(user => user.Id == request.UserId);
 
             if (!userExists)
             {
-                throw new ArgumentException("User not found.");
+                throw new ArgumentException(ErrorMessages.UserNotFound);
             }
 
             if (string.IsNullOrWhiteSpace(request.Title))
             {
-                throw new ArgumentException("Task title is required.");
+                throw new ArgumentException(ErrorMessages.TaskTitleRequired);
             }
 
             if (string.IsNullOrWhiteSpace(request.Priority))
             {
-                throw new ArgumentException("Task priority is required.");
+                throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
 
             var task = new JobTask()
@@ -112,12 +113,12 @@ namespace JobTrackr.Infrastructure.Tasks
 
             if (string.IsNullOrWhiteSpace(request.Title))
             {
-                throw new ArgumentException("Task title is required.");
+                throw new ArgumentException(ErrorMessages.TaskTitleRequired);
             }
 
             if (string.IsNullOrWhiteSpace(request.Priority))
             {
-                throw new ArgumentException("Task priority is required.");
+                throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
 
             task.Title = request.Title;

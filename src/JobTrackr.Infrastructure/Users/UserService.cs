@@ -1,3 +1,4 @@
+using JobTrackr.Application.Common;
 using JobTrackr.Application.Users;
 using JobTrackr.Domain.Entities;
 using JobTrackr.Infrastructure.Persistence;
@@ -18,12 +19,12 @@ namespace JobTrackr.Infrastructure.Users
         {
             if (string.IsNullOrWhiteSpace(request.FullName))
             {
-                throw new ArgumentException("User full name is required.");
+                throw new ArgumentException(ErrorMessages.UserFullNameRequired);
             }
 
             if (string.IsNullOrWhiteSpace(request.Email))
             {
-                throw new ArgumentException("User email is required.");
+                throw new ArgumentException(ErrorMessages.UserEmailRequired);
             }
 
             var user = new User()
@@ -80,12 +81,12 @@ namespace JobTrackr.Infrastructure.Users
         {
             if (string.IsNullOrWhiteSpace(request.FullName))
             {
-                throw new ArgumentException("User full name is required.");
+                throw new ArgumentException(ErrorMessages.UserFullNameRequired);
             }
 
             if (string.IsNullOrWhiteSpace(request.Email))
             {
-                throw new ArgumentException("User email is required.");
+                throw new ArgumentException(ErrorMessages.UserEmailRequired);
             }
 
             var user = await _dbContext.Users.FindAsync(id);

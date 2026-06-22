@@ -1,3 +1,4 @@
+using JobTrackr.Application.Common;
 using JobTrackr.Application.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +30,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound("Task not found.");
+                return NotFound(ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);
@@ -59,7 +60,7 @@ namespace JobTrackr.Api.Controllers
 
                 if (response is null)
                 {
-                    return NotFound("Task not found.");
+                    return NotFound(ErrorMessages.TaskNotFound);
                 }
 
                 return Ok(response);
@@ -77,7 +78,7 @@ namespace JobTrackr.Api.Controllers
 
             if (!isDeleted)
             {
-                return NotFound("Task not found.");
+                return NotFound(ErrorMessages.TaskNotFound);
             }
 
             return NoContent();
@@ -90,7 +91,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound("Task not found.");
+                return NotFound(ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);
@@ -103,7 +104,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound("Task not found.");
+                return NotFound(ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);

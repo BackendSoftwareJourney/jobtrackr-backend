@@ -1,3 +1,4 @@
+using JobTrackr.Application.Common;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace JobTrackr.Api.Controllers
 
             if (user is null)
             {
-                return NotFound("User not found.");
+                return NotFound(ErrorMessages.UserNotFound);
             }
 
             return Ok(user);
@@ -45,7 +46,7 @@ namespace JobTrackr.Api.Controllers
 
             if (tasks is null)
             {
-                return NotFound("User not found.");
+                return NotFound(ErrorMessages.UserNotFound);
             }
 
             return Ok(tasks);
@@ -75,7 +76,7 @@ namespace JobTrackr.Api.Controllers
 
                 if (response is null)
                 {
-                    return NotFound("User not found.");
+                    return NotFound(ErrorMessages.UserNotFound);
                 }
 
                 return Ok(response);
@@ -93,7 +94,7 @@ namespace JobTrackr.Api.Controllers
 
             if (!isDeleted)
             {
-                return NotFound("User not found.");
+                return NotFound(ErrorMessages.UserNotFound);
             }
 
             return NoContent();
