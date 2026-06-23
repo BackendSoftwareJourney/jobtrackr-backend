@@ -1,3 +1,4 @@
+using JobTrackr.Api.Middleware;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using JobTrackr.Infrastructure.Persistence;
@@ -29,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 
 app.Run();
