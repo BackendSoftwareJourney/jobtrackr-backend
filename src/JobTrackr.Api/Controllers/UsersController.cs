@@ -59,7 +59,7 @@ namespace JobTrackr.Api.Controllers
             {
                 var response = await _userService.CreateUser(request);
 
-                return Ok(response);
+                return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
             catch (ArgumentException ex)
             {
