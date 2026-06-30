@@ -21,7 +21,7 @@ namespace JobTrackr.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userService.GetAll();
+            var users = await _userService.GetAllAsync();
 
             return Ok(users);
         }
@@ -29,7 +29,7 @@ namespace JobTrackr.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _userService.GetById(id);
+            var user = await _userService.GetByIdAsync(id);
 
             if (user is null)
             {
@@ -42,7 +42,7 @@ namespace JobTrackr.Api.Controllers
         [HttpGet("{userId}/tasks")]
         public async Task<IActionResult> GetTasksByUserId(int userId)
         {
-            var tasks = await _taskService.GetByUserId(userId);
+            var tasks = await _taskService.GetByUserIdAsync(userId);
 
             if (tasks is null)
             {
@@ -57,7 +57,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _userService.CreateUser(request);
+                var response = await _userService.CreateUserAsync(request);
 
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
@@ -72,7 +72,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _userService.UpdateUser(id, request);
+                var response = await _userService.UpdateUserAsync(id, request);
 
                 if (response is null)
                 {
@@ -90,7 +90,7 @@ namespace JobTrackr.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _userService.DeleteUser(id);
+            var isDeleted = await _userService.DeleteUserAsync(id);
 
             if (!isDeleted)
             {

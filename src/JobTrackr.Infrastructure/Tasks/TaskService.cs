@@ -15,7 +15,7 @@ namespace JobTrackr.Infrastructure.Tasks
             _dbContext = dbContext;
         }
 
-        public async Task<TaskResponse> CreateTask(CreateTaskRequest request)
+        public async Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request)
         {
             if (request.UserId <= 0)
             {
@@ -56,7 +56,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<List<TaskResponse>> GetAll(bool? isCompleted, string? search, int? userId)
+        public async Task<List<TaskResponse>> GetAllAsync(bool? isCompleted, string? search, int? userId)
         {
             var query = _dbContext.Tasks.AsQueryable();
 
@@ -90,7 +90,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 .ToListAsync();
         }
 
-        public async Task<TaskResponse?> GetById(int id)
+        public async Task<TaskResponse?> GetByIdAsync(int id)
         {
             var task = await _dbContext.Tasks.FindAsync(id);
 
@@ -102,7 +102,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> UpdateTask(int id, UpdateTaskRequest request)
+        public async Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request)
         {
             var task = await _dbContext.Tasks.FindAsync(id);
 
@@ -131,7 +131,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<bool> DeleteTask(int id)
+        public async Task<bool> DeleteTaskAsync(int id)
         {
             var task = await _dbContext.Tasks.FindAsync(id);
 
@@ -146,7 +146,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return true;
         }
 
-        public async Task<TaskResponse?> CompleteTask(int id)
+        public async Task<TaskResponse?> CompleteTaskAsync(int id)
         {
             var task = await _dbContext.Tasks.FindAsync(id);
 
@@ -162,7 +162,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> ReopenTask(int id)
+        public async Task<TaskResponse?> ReopenTaskAsync(int id)
         {
             var task = await _dbContext.Tasks.FindAsync(id);
 
@@ -193,7 +193,7 @@ namespace JobTrackr.Infrastructure.Tasks
             };
         }
 
-        public async Task<List<TaskResponse>?> GetByUserId(int userId)
+        public async Task<List<TaskResponse>?> GetByUserIdAsync(int userId)
         {
             var userExists = await _dbContext.Users.AnyAsync(user => user.Id == userId);
 

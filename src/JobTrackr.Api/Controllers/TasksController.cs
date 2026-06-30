@@ -18,7 +18,7 @@ namespace JobTrackr.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(bool? isCompleted, string? search, int? userId)
         {
-            var tasks = await _taskService.GetAll(isCompleted, search, userId);
+            var tasks = await _taskService.GetAllAsync(isCompleted, search, userId);
 
             return Ok(tasks);
         }
@@ -26,7 +26,7 @@ namespace JobTrackr.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _taskService.GetById(id);
+            var response = await _taskService.GetByIdAsync(id);
 
             if (response is null)
             {
@@ -41,7 +41,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _taskService.CreateTask(request);
+                var response = await _taskService.CreateTaskAsync(request);
 
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
@@ -56,7 +56,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _taskService.UpdateTask(id, request);
+                var response = await _taskService.UpdateTaskAsync(id, request);
 
                 if (response is null)
                 {
@@ -74,7 +74,7 @@ namespace JobTrackr.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _taskService.DeleteTask(id);
+            var isDeleted = await _taskService.DeleteTaskAsync(id);
 
             if (!isDeleted)
             {
@@ -87,7 +87,7 @@ namespace JobTrackr.Api.Controllers
         [HttpPatch("{id}/complete")]
         public async Task<IActionResult> Complete(int id)
         {
-            var response = await _taskService.CompleteTask(id);
+            var response = await _taskService.CompleteTaskAsync(id);
 
             if (response is null)
             {
@@ -100,7 +100,7 @@ namespace JobTrackr.Api.Controllers
         [HttpPatch("{id}/reopen")]
         public async Task<IActionResult> Reopen(int id)
         {
-            var response = await _taskService.ReopenTask(id);
+            var response = await _taskService.ReopenTaskAsync(id);
 
             if (response is null)
             {
