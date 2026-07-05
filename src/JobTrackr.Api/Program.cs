@@ -1,4 +1,5 @@
 using JobTrackr.Api.Middleware;
+using JobTrackr.Application.Auth;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using JobTrackr.Infrastructure.Persistence;
@@ -16,7 +17,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
