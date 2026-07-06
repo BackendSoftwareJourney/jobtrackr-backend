@@ -10,6 +10,7 @@
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
+        public string PasswordHash { get; set; } = string.Empty;
         public List<JobTask> Tasks { get; set; } = [];
     }
 }

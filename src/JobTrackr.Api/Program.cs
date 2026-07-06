@@ -2,6 +2,7 @@ using JobTrackr.Api.Middleware;
 using JobTrackr.Application.Auth;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
+using JobTrackr.Infrastructure.Auth;
 using JobTrackr.Infrastructure.Persistence;
 using JobTrackr.Infrastructure.Tasks;
 using JobTrackr.Infrastructure.Users;
@@ -20,7 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
