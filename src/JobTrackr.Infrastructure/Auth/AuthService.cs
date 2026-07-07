@@ -16,6 +16,31 @@ namespace JobTrackr.Infrastructure.Auth
             _passwordHasherService = passwordHasherService;
         }
 
+        public async Task<AuthResponse> LoginAsync(LoginRequest request)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
+
+            if (user is null)
+            {
+                throw new ArgumentException("Invalid email or password.");
+            }
+
+            var passwordIsValid = _passwordHasherService.VerifyPassword(request.Password, user.PasswordHash);
+
+            if (!passwordIsValid)
+            {
+                throw new ArgumentException("Invalid email or password.");
+            }
+
+            return new AuthResponse
+            {
+                UserId = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Token = string.Empty
+            };
+        }
+
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
             var emailExists = await _dbContext.Users.AnyAsync(user => user.Email == request.Email);
