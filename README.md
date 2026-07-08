@@ -37,6 +37,10 @@ Completed so far:
 - Added `userId` filtering to the task list endpoint
 - Added optional task due date
 - Added task priority
+- Added authentication DTOs
+- Added password hashing service
+- Added register endpoint
+- Added login endpoint
 
 ## Architecture
 
@@ -85,6 +89,8 @@ PUT /api/tasks/{id}
 DELETE /api/tasks/{id}
 PATCH /api/tasks/{id}/complete
 PATCH /api/tasks/{id}/reopen
+POST /api/auth/register
+POST /api/auth/login
 ```
 
 Current behavior:
@@ -112,6 +118,10 @@ Current behavior:
 - `PATCH /api/tasks/{id}/reopen` marks a completed task as not completed.
 - Creating a task with a missing user returns `400 Bad Request`.
 - Empty task title returns `400 Bad Request`.
+- `POST /api/auth/register` registers a user, hashes the password, rejects duplicate emails, and returns a safe auth response.
+- `POST /api/auth/login` validates email and password and returns a safe auth response.
+- Authentication responses do not expose plain passwords or password hashes.
+- Login currently returns an empty token until JWT generation is added.
 
 ## Database
 
@@ -125,6 +135,7 @@ Current database features:
 - `Tasks` table
 - nullable `DueDateUtc` column on tasks
 - `Priority` column on tasks
+- `PasswordHash` column on users
 - foreign key relationship from `Tasks.UserId` to `Users.Id`
 - cascade delete from user to that user's tasks
 
@@ -161,6 +172,7 @@ Planned future work:
 - better task query options
 - stronger validation
 - better error handling
-- authentication
+- JWT token generation
+- protected endpoints
 - unit tests
 - deployment basics
