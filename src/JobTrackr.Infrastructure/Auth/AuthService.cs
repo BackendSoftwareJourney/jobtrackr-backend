@@ -9,11 +9,16 @@ namespace JobTrackr.Infrastructure.Auth
     {
         private readonly AppDbContext _dbContext;
         private readonly IPasswordHasherService _passwordHasherService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthService(AppDbContext dbContext, IPasswordHasherService passwordHasherService)
+        public AuthService(
+            AppDbContext dbContext,
+            IPasswordHasherService passwordHasherService,
+            IJwtTokenService jwtTokenService)
         {
             _dbContext = dbContext;
             _passwordHasherService = passwordHasherService;
+            _jwtTokenService = jwtTokenService;
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -32,12 +37,14 @@ namespace JobTrackr.Infrastructure.Auth
                 throw new ArgumentException("Invalid email or password.");
             }
 
+            var token = _jwtTokenService.GenerateToken(user);
+
             return new AuthResponse
             {
                 UserId = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Token = string.Empty
+                Token = token
             };
         }
 
