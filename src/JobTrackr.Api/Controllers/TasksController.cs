@@ -2,6 +2,7 @@ using JobTrackr.Application.Common;
 using JobTrackr.Application.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JobTrackr.Api.Controllers
 {
@@ -110,6 +111,18 @@ namespace JobTrackr.Api.Controllers
             }
 
             return Ok(response);
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (int.TryParse(userIdValue, out var userId))
+            {
+                return userId;
+            }
+
+            return null;
         }
     }
 }
