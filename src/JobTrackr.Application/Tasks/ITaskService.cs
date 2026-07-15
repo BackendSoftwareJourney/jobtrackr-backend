@@ -6,7 +6,7 @@ namespace JobTrackr.Application.Tasks
 
         Task<TaskResponse?> GetByIdAsync(int id);
 
-        Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request);
+        Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request, int userId);
 
         Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request);
 

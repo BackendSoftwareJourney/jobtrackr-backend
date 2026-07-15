@@ -17,7 +17,5 @@ namespace JobTrackr.Application.Tasks
         [MaxLength(20)]
         public string Priority { get; set; } = "Medium";
 
-        [Range(1, int.MaxValue)]
-        public int UserId { get; set; }
     }
 }

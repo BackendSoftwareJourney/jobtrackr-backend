@@ -15,14 +15,14 @@ namespace JobTrackr.Infrastructure.Tasks
             _dbContext = dbContext;
         }
 
-        public async Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request)
+        public async Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request, int userId)
         {
-            if (request.UserId <= 0)
+            if (userId <= 0)
             {
                 throw new ArgumentException(ErrorMessages.UserIdRequired);
             }
 
-            var userExists = await _dbContext.Users.AnyAsync(user => user.Id == request.UserId);
+            var userExists = await _dbContext.Users.AnyAsync(user => user.Id == userId);
 
             if (!userExists)
             {
@@ -47,7 +47,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 DueDateUtc = request.DueDateUtc,
                 Priority = request.Priority,
                 IsCompleted = false,
-                UserId = request.UserId
+                UserId = userId
             };
 
             _dbContext.Tasks.Add(task);

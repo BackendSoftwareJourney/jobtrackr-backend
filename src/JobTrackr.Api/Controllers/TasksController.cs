@@ -44,7 +44,14 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _taskService.CreateTaskAsync(request);
+                var currentUserId = GetCurrentUserId();
+
+                if (currentUserId is null)
+                {
+                    return Unauthorized();
+                }
+
+                var response = await _taskService.CreateTaskAsync(request, currentUserId.Value);
 
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
