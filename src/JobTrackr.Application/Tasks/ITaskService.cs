@@ -4,7 +4,7 @@ namespace JobTrackr.Application.Tasks
     {
         Task<List<TaskResponse>> GetAllAsync(bool? isCompleted, string? search, int userId);
 
-        Task<TaskResponse?> GetByIdAsync(int id);
+        Task<TaskResponse?> GetByIdAsync(int id, int userId);
 
         Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request, int userId);
 

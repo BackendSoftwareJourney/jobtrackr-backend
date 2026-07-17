@@ -85,9 +85,10 @@ namespace JobTrackr.Infrastructure.Tasks
                 .ToListAsync();
         }
 
-        public async Task<TaskResponse?> GetByIdAsync(int id)
+        public async Task<TaskResponse?> GetByIdAsync(int id, int userId)
         {
-            var task = await _dbContext.Tasks.FindAsync(id);
+            var task = await _dbContext.Tasks
+                .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
 
             if (task is null)
             {

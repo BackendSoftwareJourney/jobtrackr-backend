@@ -36,7 +36,14 @@ namespace JobTrackr.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _taskService.GetByIdAsync(id);
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var response = await _taskService.GetByIdAsync(id, currentUserId.Value);
 
             if (response is null)
             {
