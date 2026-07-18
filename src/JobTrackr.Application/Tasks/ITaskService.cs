@@ -8,7 +8,7 @@ namespace JobTrackr.Application.Tasks
 
         Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request, int userId);
 
-        Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request);
+        Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request, int userId);
 
         Task<bool> DeleteTaskAsync(int id);
 

@@ -80,7 +80,14 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _taskService.UpdateTaskAsync(id, request);
+                var currentUserId = GetCurrentUserId();
+
+                if (currentUserId is null)
+                {
+                    return Unauthorized();
+                }
+
+                var response = await _taskService.UpdateTaskAsync(id, request, currentUserId.Value);
 
                 if (response is null)
                 {

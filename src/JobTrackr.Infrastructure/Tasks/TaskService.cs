@@ -98,9 +98,10 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request)
+        public async Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request, int userId)
         {
-            var task = await _dbContext.Tasks.FindAsync(id);
+            var task = await _dbContext.Tasks
+                .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
 
             if (task is null)
             {
