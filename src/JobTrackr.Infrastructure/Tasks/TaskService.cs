@@ -128,9 +128,10 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<bool> DeleteTaskAsync(int id)
+        public async Task<bool> DeleteTaskAsync(int id, int userId)
         {
-            var task = await _dbContext.Tasks.FindAsync(id);
+            var task = await _dbContext.Tasks
+                .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
 
             if (task is null)
             {

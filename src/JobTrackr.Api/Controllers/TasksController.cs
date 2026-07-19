@@ -105,7 +105,14 @@ namespace JobTrackr.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _taskService.DeleteTaskAsync(id);
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var isDeleted = await _taskService.DeleteTaskAsync(id, currentUserId.Value);
 
             if (!isDeleted)
             {
