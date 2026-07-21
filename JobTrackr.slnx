@@ -5,4 +5,7 @@
     <Project Path="src/JobTrackr.Domain/JobTrackr.Domain.csproj" />
     <Project Path="src/JobTrackr.Infrastructure/JobTrackr.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JobTrackr.Tests/JobTrackr.Tests.csproj" />
+  </Folder>
 </Solution>
