@@ -24,8 +24,14 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
+      - name: Restore API dependencies
         run: dotnet restore src/JobTrackr.Api/JobTrackr.Api.csproj
+
+      - name: Restore test dependencies
+        run: dotnet restore tests/JobTrackr.Tests/JobTrackr.Tests.csproj
 
       - name: Build
         run: dotnet build src/JobTrackr.Api/JobTrackr.Api.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/JobTrackr.Tests/JobTrackr.Tests.csproj --configuration Release --no-restore
