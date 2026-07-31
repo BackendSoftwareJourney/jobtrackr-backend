@@ -1,46 +1,30 @@
 # JobTrackr Backend
 
-JobTrackr is a learning-focused .NET 8 Web API project for building backend engineering skills step by step.
+JobTrackr is a learning-focused .NET 8 Web API project built step by step using production-style backend practices.
 
-The goal is to grow this project into a practical backend portfolio API using C#, ASP.NET Core, SQL Server, clean architecture basics, authentication, and production-style API development.
+The project currently includes users, user-owned tasks, SQL Server persistence, JWT authentication, automated service tests, and GitHub Actions CI.
 
-## Current Progress
+## Current Features
 
-Completed so far:
-
-- Created solution structure
-- Created ASP.NET Core Web API project
-- Created Application, Domain, and Infrastructure class libraries
-- Added project references
-- Created first domain entities
-- Added task create endpoint
-- Added get all tasks endpoint
-- Added get task by id endpoint
-- Added update task endpoint
-- Added delete task endpoint
-- Added complete task endpoint
-- Added reopen task endpoint
-- Added user create endpoint
-- Added get all users endpoint
-- Added get user by id endpoint
-- Added update user endpoint
-- Added delete user endpoint
-- Connected tasks to users with `UserId`
-- Added basic task title validation
-- Removed default WeatherForecast API
-- Added Entity Framework Core
-- Added SQL Server persistence
-- Added database-backed user service
-- Added database-backed task service
-- Added explicit task-user relationship in EF Core
-- Added endpoint to get tasks for one user
-- Added `userId` filtering to the task list endpoint
-- Added optional task due date
-- Added task priority
-- Added authentication DTOs
-- Added password hashing service
-- Added register endpoint
-- Added login endpoint
+- ASP.NET Core Web API targeting .NET 8
+- Api, Application, Domain, and Infrastructure projects
+- SQL Server persistence with Entity Framework Core
+- EF Core migrations
+- User CRUD endpoints
+- Task CRUD endpoints
+- Task completion and reopen endpoints
+- Optional task due dates
+- Low, Medium, and High task priority values
+- Task filtering by completion status and title search
+- Password hashing
+- User registration and login
+- JWT token generation
+- JWT-protected task endpoints
+- User-owned task creation, listing, retrieval, update, and deletion
+- Global exception handling
+- Request DTO validation
+- xUnit service tests using EF Core InMemory
+- GitHub Actions Release build and automated test execution
 
 ## Architecture
 
@@ -49,25 +33,57 @@ JobTrackr.Api
 JobTrackr.Application
 JobTrackr.Domain
 JobTrackr.Infrastructure
+JobTrackr.Tests
 ```
 
 ### JobTrackr.Api
 
-Contains API controllers and application startup configuration.
+Contains API controllers, middleware, authentication configuration, dependency registration, and application startup.
 
 ### JobTrackr.Application
 
-Contains DTOs and service interfaces.
+Contains request and response DTOs, service interfaces, shared messages, password hashing, and authentication contracts.
 
 ### JobTrackr.Domain
 
-Contains core business entities.
+Contains the core `User` and `JobTask` entities.
 
 ### JobTrackr.Infrastructure
 
-Contains EF Core database context, migrations, and database-backed service implementations.
+Contains EF Core database access, migrations, SQL Server service implementations, authentication service logic, and JWT token generation.
+
+### JobTrackr.Tests
+
+Contains xUnit service tests using an isolated EF Core in-memory database.
 
 ## Current Endpoints
+
+### Authentication
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+```
+
+### Tasks
+
+Task endpoints require a valid Bearer token.
+
+```http
+GET /api/tasks
+GET /api/tasks?isCompleted=true
+GET /api/tasks?isCompleted=false
+GET /api/tasks?search=resume
+GET /api/tasks?isCompleted=false&search=resume
+POST /api/tasks
+GET /api/tasks/{id}
+PUT /api/tasks/{id}
+DELETE /api/tasks/{id}
+PATCH /api/tasks/{id}/complete
+PATCH /api/tasks/{id}/reopen
+```
+
+### Users
 
 ```http
 GET /api/users
@@ -76,52 +92,35 @@ GET /api/users/{id}
 GET /api/users/{userId}/tasks
 PUT /api/users/{id}
 DELETE /api/users/{id}
-GET /api/tasks
-GET /api/tasks?isCompleted=true
-GET /api/tasks?isCompleted=false
-GET /api/tasks?search=resume
-GET /api/tasks?userId=1
-GET /api/tasks?isCompleted=true&search=resume
-GET /api/tasks?userId=1&isCompleted=false&search=resume
-POST /api/tasks
-GET /api/tasks/{id}
-PUT /api/tasks/{id}
-DELETE /api/tasks/{id}
-PATCH /api/tasks/{id}/complete
-PATCH /api/tasks/{id}/reopen
-POST /api/auth/register
-POST /api/auth/login
 ```
 
-Current behavior:
+## Authentication Behavior
 
-- `GET /api/users` returns all users from SQL Server.
-- `POST /api/users` creates a user in SQL Server.
-- `GET /api/users/{id}` returns one user or `404 Not Found`.
-- `GET /api/users/{userId}/tasks` returns tasks for one user, returns an empty list if the user has no tasks, and returns `404 Not Found` if the user does not exist.
-- `PUT /api/users/{id}` updates user full name and email.
-- `DELETE /api/users/{id}` deletes a user or returns `404 Not Found`.
-- `POST /api/tasks` requires `UserId`, creates a task for an existing user, and returns `201 Created`.
-- Tasks can optionally have `DueDateUtc`.
-- Tasks have a priority value such as `Low`, `Medium`, or `High`.
-- `GET /api/tasks` returns all tasks and can optionally filter by completion status.
-- `GET /api/tasks?isCompleted=true` returns completed tasks.
-- `GET /api/tasks?isCompleted=false` returns incomplete tasks.
-- `GET /api/tasks?search=resume` searches tasks by title.
-- `GET /api/tasks?userId=1` returns tasks for one user.
-- `GET /api/tasks?isCompleted=true&search=resume` combines completion filtering and title search.
-- `GET /api/tasks?userId=1&isCompleted=false&search=resume` combines user, completion, and title filters.
-- `GET /api/tasks/{id}` returns one task or `404 Not Found`.
-- `PUT /api/tasks/{id}` updates task title and description.
-- `DELETE /api/tasks/{id}` deletes a task or returns `404 Not Found`.
-- `PATCH /api/tasks/{id}/complete` marks a task as completed.
-- `PATCH /api/tasks/{id}/reopen` marks a completed task as not completed.
-- Creating a task with a missing user returns `400 Bad Request`.
-- Empty task title returns `400 Bad Request`.
-- `POST /api/auth/register` registers a user, hashes the password, rejects duplicate emails, and returns a safe auth response.
-- `POST /api/auth/login` validates email and password and returns a safe auth response.
-- Authentication responses do not expose plain passwords or password hashes.
-- Login currently returns an empty token until JWT generation is added.
+- Registration rejects an email that is already registered.
+- Passwords are hashed before they are stored.
+- Authentication responses do not expose passwords or password hashes.
+- Registration currently returns an empty token.
+- Successful login returns a JWT token.
+- Invalid login credentials return a safe authentication error.
+- Protected task endpoints require `Authorization: Bearer TOKEN`.
+
+## Task Ownership Behavior
+
+- Task creation does not accept `UserId` in the request body.
+- A new task automatically belongs to the authenticated user.
+- `GET /api/tasks` returns only tasks owned by the authenticated user.
+- Completion and title filters apply only to the authenticated user's tasks.
+- Get By Id returns a task only when the authenticated user owns it.
+- Update changes a task only when the authenticated user owns it.
+- Delete removes a task only when the authenticated user owns it.
+- Missing tasks and tasks owned by another user return `404 Not Found` for ownership-protected operations.
+
+## Current Authorization Limitations
+
+- Complete and Reopen require authentication but do not yet check task ownership.
+- User CRUD endpoints are not yet protected by authorization.
+
+These limitations are planned future improvements and should not be treated as completed security behavior.
 
 ## Database
 
@@ -133,22 +132,81 @@ Current database features:
 - EF Core migrations
 - `Users` table
 - `Tasks` table
+- `PasswordHash` column on users
 - nullable `DueDateUtc` column on tasks
 - `Priority` column on tasks
-- `PasswordHash` column on users
-- foreign key relationship from `Tasks.UserId` to `Users.Id`
-- cascade delete from user to that user's tasks
+- foreign key from `Tasks.UserId` to `Users.Id`
+- cascade delete from a user to that user's tasks
 
-## Run The Project
+## Automated Tests
+
+JobTrackr currently has 15 xUnit service tests.
+
+Current test coverage includes:
+
+- password hashing and verification
+- registration
+- valid login
+- invalid-password login
+- valid task creation
+- empty task title validation
+- existing and missing task retrieval
+- valid task update
+- missing-task update
+- empty-title update validation
+- successful and missing task deletion
+- valid user creation
+- existing user retrieval
+
+Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
+
+### Run all tests
 
 From the project root:
 
-```bash
-dotnet build
-dotnet run --project src/JobTrackr.Api
+```powershell
+dotnet restore tests\JobTrackr.Tests\JobTrackr.Tests.csproj
+dotnet test tests\JobTrackr.Tests\JobTrackr.Tests.csproj --configuration Release --no-restore
 ```
 
-Then open Swagger:
+Expected result:
+
+```text
+Passed: 15
+Failed: 0
+Skipped: 0
+```
+
+## GitHub Actions
+
+The workflow is stored at:
+
+```text
+.github/workflows/build.yml
+```
+
+On pushes and pull requests to `main`, GitHub Actions:
+
+1. Checks out the repository.
+2. Installs the .NET 8 SDK.
+3. Restores API dependencies.
+4. Restores test dependencies.
+5. Builds the API and production projects in Release configuration.
+6. Runs all automated tests.
+
+The tests use an in-memory database, so the workflow does not require SQL Server or repository secrets.
+
+## Run The API
+
+From the project root:
+
+```powershell
+dotnet restore src\JobTrackr.Api\JobTrackr.Api.csproj
+dotnet build src\JobTrackr.Api\JobTrackr.Api.csproj
+dotnet run --project src\JobTrackr.Api
+```
+
+Open the Swagger URL shown in the terminal:
 
 ```text
 https://localhost:PORT/swagger
@@ -162,17 +220,19 @@ This project is part of a long-term backend engineering journey focused on:
 - ASP.NET Core Web API
 - SQL Server
 - backend architecture
-- DSA/problem solving
+- authentication and authorization
+- automated testing
+- continuous integration
+- deployment
 - interview communication
 
 ## Next Steps
 
-Planned future work:
+Planned work includes:
 
-- better task query options
-- stronger validation
-- better error handling
-- JWT token generation
-- protected endpoints
-- unit tests
-- deployment basics
+- owner protection for Complete and Reopen
+- stronger authorization for user endpoints
+- broader automated test coverage
+- request logging
+- API reliability improvements
+- deployment fundamentals
