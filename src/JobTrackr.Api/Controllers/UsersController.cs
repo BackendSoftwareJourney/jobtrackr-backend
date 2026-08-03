@@ -33,7 +33,7 @@ namespace JobTrackr.Api.Controllers
 
             if (user is null)
             {
-                return NotFound(ErrorMessages.UserNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.UserNotFound);
             }
 
             return Ok(user);
@@ -46,7 +46,7 @@ namespace JobTrackr.Api.Controllers
 
             if (tasks is null)
             {
-                return NotFound(ErrorMessages.UserNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.UserNotFound);
             }
 
             return Ok(tasks);
@@ -63,7 +63,7 @@ namespace JobTrackr.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
             }
         }
 
@@ -76,14 +76,14 @@ namespace JobTrackr.Api.Controllers
 
                 if (response is null)
                 {
-                    return NotFound(ErrorMessages.UserNotFound);
+                    return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.UserNotFound);
                 }
 
                 return Ok(response);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
             }
         }
 
@@ -94,7 +94,7 @@ namespace JobTrackr.Api.Controllers
 
             if (!isDeleted)
             {
-                return NotFound(ErrorMessages.UserNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.UserNotFound);
             }
 
             return NoContent();

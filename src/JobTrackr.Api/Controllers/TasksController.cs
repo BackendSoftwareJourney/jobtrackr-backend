@@ -47,7 +47,10 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound(ErrorMessages.TaskNotFound);
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Not Found",
+                    detail: ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);
@@ -71,7 +74,7 @@ namespace JobTrackr.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
             }
         }
 
@@ -91,14 +94,14 @@ namespace JobTrackr.Api.Controllers
 
                 if (response is null)
                 {
-                    return NotFound(ErrorMessages.TaskNotFound);
+                    return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.TaskNotFound);
                 }
 
                 return Ok(response);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
             }
         }
 
@@ -116,7 +119,7 @@ namespace JobTrackr.Api.Controllers
 
             if (!isDeleted)
             {
-                return NotFound(ErrorMessages.TaskNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.TaskNotFound);
             }
 
             return NoContent();
@@ -129,7 +132,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound(ErrorMessages.TaskNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);
@@ -142,7 +145,7 @@ namespace JobTrackr.Api.Controllers
 
             if (response is null)
             {
-                return NotFound(ErrorMessages.TaskNotFound);
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: "Not Found", detail: ErrorMessages.TaskNotFound);
             }
 
             return Ok(response);
