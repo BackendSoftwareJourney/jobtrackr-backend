@@ -196,21 +196,189 @@ On pushes and pull requests to `main`, GitHub Actions:
 
 The tests use an in-memory database, so the workflow does not require SQL Server or repository secrets.
 
-## Run The API
+## Local Environment Setup
 
-From the project root:
+### Prerequisites
+
+Install or provide:
+
+- .NET 8 SDK
+- SQL Server
+- SQL Server Management Studio or another SQL client
+- EF Core command-line tools 8.x
+- Git
+
+Confirm the .NET SDK:
 
 ```powershell
-dotnet restore src\JobTrackr.Api\JobTrackr.Api.csproj
-dotnet build src\JobTrackr.Api\JobTrackr.Api.csproj
-dotnet run --project src\JobTrackr.Api
+dotnet --version
 ```
 
-Open the Swagger URL shown in the terminal:
+The installed SDK must support projects targeting `net8.0`.
+
+Confirm the EF Core tools:
+
+```powershell
+dotnet ef --version
+```
+
+If `dotnet ef` is not installed, install the .NET 8 version:
+
+```powershell
+dotnet tool install --global dotnet-ef --version 8.0.27
+```
+
+### Restore Dependencies
+
+From the repository root:
+
+```powershell
+cd C:\path\to\JobTrackr
+dotnet restore src\JobTrackr.Api\JobTrackr.Api.csproj
+dotnet restore tests\JobTrackr.Tests\JobTrackr.Tests.csproj
+```
+
+Replace `C:\path\to\JobTrackr` with the actual repository location.
+
+### Configure SQL Server
+
+The Development environment reads its local connection string from:
 
 ```text
-https://localhost:PORT/swagger
+src\JobTrackr.Api\appsettings.Development.json
 ```
+
+The default local configuration is:
+
+```text
+Server=localhost;Database=JobTrackrDb;Trusted_Connection=True;TrustServerCertificate=True
+```
+
+Requirements:
+
+- SQL Server must be running locally.
+- Windows authentication must be available for the current Windows user.
+- The current user must be allowed to create or update `JobTrackrDb`.
+
+If the SQL Server instance name differs, update only the appropriate local development configuration. Never commit a database password.
+
+Apply the existing EF Core migrations:
+
+```powershell
+dotnet ef database update --project src\JobTrackr.Infrastructure --startup-project src\JobTrackr.Api
+```
+
+This creates or updates `JobTrackrDb` using the migrations stored in the Infrastructure project.
+
+### Configure The JWT Signing Key
+
+The repository does not contain a JWT signing key.
+
+Generate and store a local key with .NET User Secrets:
+
+```powershell
+$jwtKey = [Guid]::NewGuid().ToString("N") + [Guid]::NewGuid().ToString("N")
+dotnet user-secrets set "Jwt:Key" "$jwtKey" --project src\JobTrackr.Api
+Remove-Variable jwtKey
+```
+
+The `UserSecretsId` is tracked in the API project file, but the secret value is stored outside the repository in the current Windows user profile.
+
+Do not add the JWT key to `appsettings.json`, `appsettings.Development.json`, source code, documentation, or Git.
+
+### Trust The Development HTTPS Certificate
+
+Run once on the development machine:
+
+```powershell
+dotnet dev-certs https --trust
+```
+
+Accept the Windows trust prompt if it appears.
+
+### Build And Test
+
+```powershell
+dotnet build src\JobTrackr.Api\JobTrackr.Api.csproj --configuration Release
+dotnet test tests\JobTrackr.Tests\JobTrackr.Tests.csproj --configuration Release
+```
+
+Expected test result:
+
+```text
+Passed: 15
+Failed: 0
+Skipped: 0
+```
+
+The automated tests use EF Core InMemory and do not connect to SQL Server.
+
+### Run The API
+
+```powershell
+dotnet run --project src\JobTrackr.Api --launch-profile https
+```
+
+Default local addresses:
+
+```text
+https://localhost:7024
+http://localhost:5123
+```
+
+Open Swagger:
+
+```text
+https://localhost:7024/swagger
+```
+
+Check API health:
+
+```text
+https://localhost:7024/health
+```
+
+Expected health response:
+
+```text
+Healthy
+```
+
+### Test Authentication
+
+1. Call `POST /api/auth/register` to create a user.
+2. Call `POST /api/auth/login` with the registered email and password.
+3. Copy the JWT token returned by login.
+
+Swagger can be used for registration and login. The current Swagger configuration does not yet provide a Bearer-token **Authorize** button.
+
+Test the protected task endpoint from PowerShell:
+
+```powershell
+$token = "PASTE_LOGIN_TOKEN_HERE"
+Invoke-RestMethod -Uri "https://localhost:7024/api/tasks" -Headers @{ Authorization = "Bearer $token" }
+Remove-Variable token
+```
+
+Without a valid token, protected task endpoints return:
+
+```text
+401 Unauthorized
+```
+
+With a valid Bearer token, the authenticated user can access their task endpoints.
+
+### Local Configuration Safety
+
+Never commit:
+
+- JWT signing keys
+- database passwords
+- access tokens
+- user passwords
+- production connection strings
+
+For local development, use User Secrets for secret values. A future deployment must provide secrets through environment variables or a secure secret manager.
 
 ## Learning Goal
 
