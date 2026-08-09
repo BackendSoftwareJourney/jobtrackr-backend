@@ -25,7 +25,10 @@ namespace JobTrackr.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Bad Request",
+                    detail: ex.Message);
             }
         }
 
@@ -40,7 +43,10 @@ namespace JobTrackr.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Bad Request", detail: ex.Message);
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Bad Request",
+                    detail: ex.Message);
             }
         }
     }

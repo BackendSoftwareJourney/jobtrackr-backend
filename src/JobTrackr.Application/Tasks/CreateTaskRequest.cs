@@ -16,6 +16,5 @@ namespace JobTrackr.Application.Tasks
         [Required]
         [MaxLength(20)]
         public string Priority { get; set; } = "Medium";
-
     }
 }
