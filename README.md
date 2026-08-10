@@ -2,7 +2,7 @@
 
 JobTrackr is a learning-focused .NET 8 Web API project built step by step using production-style backend practices.
 
-The project currently includes users, user-owned tasks, SQL Server persistence, JWT authentication, automated service tests, and GitHub Actions CI.
+The project currently includes users, user-owned tasks, SQL Server persistence, JWT authentication, structured error handling, request logging, health checks, automated service tests, and GitHub Actions CI.
 
 ## Current Features
 
@@ -21,8 +21,14 @@ The project currently includes users, user-owned tasks, SQL Server persistence, 
 - JWT token generation
 - JWT-protected task endpoints
 - User-owned task creation, listing, retrieval, update, and deletion
-- Global exception handling
-- Request DTO validation
+- Global exception handling with safe `ProblemDetails` responses
+- Structured `ProblemDetails` responses for known API errors
+- Request DTO validation with field-level errors
+- Basic request logging for method, path, status code, and elapsed time
+- Public `GET /health` application health endpoint
+- Environment-specific local configuration
+- JWT signing key stored outside Git with .NET User Secrets
+- Documented local SQL Server, migration, HTTPS, and authentication setup
 - xUnit service tests using EF Core InMemory
 - GitHub Actions Release build and automated test execution
 
@@ -57,6 +63,16 @@ Contains EF Core database access, migrations, SQL Server service implementations
 Contains xUnit service tests using an isolated EF Core in-memory database.
 
 ## Current Endpoints
+
+### Health
+
+```http
+GET /health
+```
+
+The health endpoint is public and returns `200 OK` with `Healthy` while the API is running.
+
+It is mapped directly in `Program.cs`, so it may not appear in Swagger.
 
 ### Authentication
 
@@ -122,6 +138,15 @@ DELETE /api/users/{id}
 
 These limitations are planned future improvements and should not be treated as completed security behavior.
 
+## API Reliability Behavior
+
+- Invalid DTOs return `400 Bad Request` with field-level validation errors.
+- Known bad requests and missing resources return structured `ProblemDetails` responses.
+- Unexpected exceptions return a safe `500 Internal Server Error` response without exposing stack traces.
+- Request logs record the HTTP method, path, status code, and elapsed time.
+- Request bodies, passwords, JWT tokens, authorization headers, and signing keys are not logged.
+- `GET /health` provides a basic public application health check.
+
 ## Database
 
 JobTrackr uses SQL Server with Entity Framework Core.
@@ -137,6 +162,14 @@ Current database features:
 - `Priority` column on tasks
 - foreign key from `Tasks.UserId` to `Users.Id`
 - cascade delete from a user to that user's tasks
+
+## Configuration
+
+- Shared non-secret settings are stored in `appsettings.json`.
+- The local SQL Server connection string is stored in `appsettings.Development.json`.
+- The local JWT signing key is stored outside the repository with .NET User Secrets.
+- HTTPS is the default local launch profile.
+- Production secrets must be supplied through environment variables or a secure secret manager in a future deployment.
 
 ## Automated Tests
 
@@ -159,6 +192,8 @@ Current test coverage includes:
 - existing user retrieval
 
 Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
+
+The current API has also passed a manual regression flow covering health, registration, login, validation, task CRUD and filters, two-user ownership isolation, user CRUD, structured errors, and request logging.
 
 ### Run all tests
 
@@ -400,7 +435,7 @@ Planned work includes:
 
 - owner protection for Complete and Reopen
 - stronger authorization for user endpoints
-- broader automated test coverage
-- request logging
-- API reliability improvements
+- Swagger Bearer-token configuration
+- broader controller and integration test coverage
+- database-aware health checks when operationally useful
 - deployment fundamentals
