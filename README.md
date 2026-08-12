@@ -4,6 +4,14 @@ JobTrackr is a learning-focused .NET 8 Web API project built step by step using 
 
 The project currently includes users, user-owned tasks, SQL Server persistence, JWT authentication, structured error handling, request logging, health checks, automated service tests, and GitHub Actions CI.
 
+## The First 90 Days Book
+
+The first 90 days of the JobTrackr backend journey are available as a 330-page PDF book:
+
+[Read or download Backend Software Journey: The First 90 Days](docs/book/backend-software-journey-90-days.pdf)
+
+The book follows the project from initial solution setup through SQL Server persistence, authentication, task ownership, testing, continuous integration, reliability improvements, and the Month 3 review.
+
 ## Current Features
 
 - ASP.NET Core Web API targeting .NET 8
