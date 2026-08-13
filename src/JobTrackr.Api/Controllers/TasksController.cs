@@ -19,7 +19,7 @@ namespace JobTrackr.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(bool? isCompleted, string? search)
+        public async Task<IActionResult> GetAll([FromQuery] TaskQueryRequest request)
         {
             var currentUserId = GetCurrentUserId();
 
@@ -28,7 +28,10 @@ namespace JobTrackr.Api.Controllers
                 return Unauthorized();
             }
 
-            var tasks = await _taskService.GetAllAsync(isCompleted, search, currentUserId.Value);
+            var tasks = await _taskService.GetAllAsync(
+                request.IsCompleted,
+                request.Search,
+                currentUserId.Value);
 
             return Ok(tasks);
         }
