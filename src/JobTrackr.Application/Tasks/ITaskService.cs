@@ -2,7 +2,12 @@ namespace JobTrackr.Application.Tasks
 {
     public interface ITaskService
     {
-        Task<List<TaskResponse>> GetAllAsync(bool? isCompleted, string? search, int userId);
+        Task<List<TaskResponse>> GetAllAsync(
+            bool? isCompleted,
+            string? search,
+            int pageNumber,
+            int pageSize,
+            int userId);
 
         Task<TaskResponse?> GetByIdAsync(int id, int userId);
 

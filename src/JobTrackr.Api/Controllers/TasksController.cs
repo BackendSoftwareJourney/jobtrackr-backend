@@ -31,6 +31,8 @@ namespace JobTrackr.Api.Controllers
             var tasks = await _taskService.GetAllAsync(
                 request.IsCompleted,
                 request.Search,
+                request.PageNumber,
+                request.PageSize,
                 currentUserId.Value);
 
             return Ok(tasks);

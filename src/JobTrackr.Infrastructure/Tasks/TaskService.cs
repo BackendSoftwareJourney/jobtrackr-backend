@@ -56,7 +56,12 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<List<TaskResponse>> GetAllAsync(bool? isCompleted, string? search, int userId)
+        public async Task<List<TaskResponse>> GetAllAsync(
+            bool? isCompleted,
+            string? search,
+            int pageNumber,
+            int pageSize,
+            int userId)
         {
             var query = _dbContext.Tasks.Where(task => task.UserId == userId);
 
@@ -70,7 +75,12 @@ namespace JobTrackr.Infrastructure.Tasks
                 query = query.Where(task => task.Title.Contains(search));
             }
 
+            var skip = (pageNumber - 1) * pageSize;
+
             return await query
+                .OrderBy(task => task.Id)
+                .Skip(skip)
+                .Take(pageSize)
                 .Select(task => new TaskResponse
                 {
                     Id = task.Id,
