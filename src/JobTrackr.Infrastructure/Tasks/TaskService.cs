@@ -56,7 +56,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<List<TaskResponse>> GetAllAsync(
+        public async Task<PagedResponse<TaskResponse>> GetAllAsync(
             bool? isCompleted,
             string? search,
             int pageNumber,
@@ -75,9 +75,11 @@ namespace JobTrackr.Infrastructure.Tasks
                 query = query.Where(task => task.Title.Contains(search));
             }
 
+            var totalCount = await query.CountAsync();
+
             var skip = (pageNumber - 1) * pageSize;
 
-            return await query
+            var items = await query
                 .OrderBy(task => task.Id)
                 .Skip(skip)
                 .Take(pageSize)
@@ -93,6 +95,17 @@ namespace JobTrackr.Infrastructure.Tasks
                     UserId = task.UserId
                 })
                 .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            return new PagedResponse<TaskResponse>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
         }
 
         public async Task<TaskResponse?> GetByIdAsync(int id, int userId)

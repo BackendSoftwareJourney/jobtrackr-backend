@@ -21,9 +21,13 @@ namespace JobTrackr.Tests.Tasks
                 2,
                 user.Id);
 
-            Assert.Equal(2, response.Count);
-            Assert.Equal("Task 3", response[0].Title);
-            Assert.Equal("Task 4", response[1].Title);
+            Assert.Equal(2, response.Items.Count);
+            Assert.Equal("Task 3", response.Items[0].Title);
+            Assert.Equal("Task 4", response.Items[1].Title);
+            Assert.Equal(2, response.PageNumber);
+            Assert.Equal(2, response.PageSize);
+            Assert.Equal(5, response.TotalCount);
+            Assert.Equal(3, response.TotalPages);
         }
 
         [Fact]
@@ -40,7 +44,11 @@ namespace JobTrackr.Tests.Tasks
                 100,
                 user.Id);
 
-            Assert.Equal(5, response.Count);
+            Assert.Equal(5, response.Items.Count);
+            Assert.Equal(1, response.PageNumber);
+            Assert.Equal(100, response.PageSize);
+            Assert.Equal(5, response.TotalCount);
+            Assert.Equal(1, response.TotalPages);
         }
 
         private static AppDbContext CreateDbContext()

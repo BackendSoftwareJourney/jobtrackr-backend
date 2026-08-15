@@ -1,8 +1,10 @@
+using JobTrackr.Application.Common;
+
 namespace JobTrackr.Application.Tasks
 {
     public interface ITaskService
     {
-        Task<List<TaskResponse>> GetAllAsync(
+        Task<PagedResponse<TaskResponse>> GetAllAsync(
             bool? isCompleted,
             string? search,
             int pageNumber,
