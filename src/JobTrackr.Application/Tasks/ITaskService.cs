@@ -7,6 +7,7 @@ namespace JobTrackr.Application.Tasks
         Task<PagedResponse<TaskResponse>> GetAllAsync(
             bool? isCompleted,
             string? search,
+            string sortDirection,
             int pageNumber,
             int pageSize,
             int userId);

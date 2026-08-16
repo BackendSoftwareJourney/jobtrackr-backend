@@ -8,6 +8,11 @@ namespace JobTrackr.Application.Tasks
 
         public string? Search { get; set; }
 
+        [RegularExpression(
+            "^(asc|desc)$",
+            ErrorMessage = "Sort direction must be asc or desc.")]
+        public string SortDirection { get; set; } = "desc";
+
         [Range(1, int.MaxValue, ErrorMessage = "Page number must be at least 1.")]
         public int PageNumber { get; set; } = 1;
 

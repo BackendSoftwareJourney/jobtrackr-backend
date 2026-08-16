@@ -59,6 +59,7 @@ namespace JobTrackr.Infrastructure.Tasks
         public async Task<PagedResponse<TaskResponse>> GetAllAsync(
             bool? isCompleted,
             string? search,
+            string sortDirection,
             int pageNumber,
             int pageSize,
             int userId)
@@ -79,8 +80,18 @@ namespace JobTrackr.Infrastructure.Tasks
 
             var skip = (pageNumber - 1) * pageSize;
 
-            var items = await query
-                .OrderBy(task => task.Id)
+            var orderedQuery = string.Equals(
+                sortDirection,
+                "asc",
+                StringComparison.OrdinalIgnoreCase)
+                ? query
+                    .OrderBy(task => task.CreatedAtUtc)
+                    .ThenBy(task => task.Id)
+                : query
+                    .OrderByDescending(task => task.CreatedAtUtc)
+                    .ThenByDescending(task => task.Id);
+
+            var items = await orderedQuery
                 .Skip(skip)
                 .Take(pageSize)
                 .Select(task => new TaskResponse

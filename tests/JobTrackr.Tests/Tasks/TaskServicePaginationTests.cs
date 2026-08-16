@@ -17,13 +17,14 @@ namespace JobTrackr.Tests.Tasks
             var response = await taskService.GetAllAsync(
                 null,
                 null,
+                "desc",
                 2,
                 2,
                 user.Id);
 
             Assert.Equal(2, response.Items.Count);
             Assert.Equal("Task 3", response.Items[0].Title);
-            Assert.Equal("Task 4", response.Items[1].Title);
+            Assert.Equal("Task 2", response.Items[1].Title);
             Assert.Equal(2, response.PageNumber);
             Assert.Equal(2, response.PageSize);
             Assert.Equal(5, response.TotalCount);
@@ -40,6 +41,7 @@ namespace JobTrackr.Tests.Tasks
             var response = await taskService.GetAllAsync(
                 null,
                 null,
+                "desc",
                 1,
                 100,
                 user.Id);
