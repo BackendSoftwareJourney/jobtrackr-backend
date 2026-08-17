@@ -9,6 +9,11 @@ namespace JobTrackr.Application.Tasks
         public string? Search { get; set; }
 
         [RegularExpression(
+            "^(createdAt|dueDate)$",
+            ErrorMessage = "Sort field must be createdAt or dueDate.")]
+        public string SortBy { get; set; } = "createdAt";
+
+        [RegularExpression(
             "^(asc|desc)$",
             ErrorMessage = "Sort direction must be asc or desc.")]
         public string SortDirection { get; set; } = "desc";

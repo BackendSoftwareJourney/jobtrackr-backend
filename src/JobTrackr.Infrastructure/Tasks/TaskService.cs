@@ -59,6 +59,7 @@ namespace JobTrackr.Infrastructure.Tasks
         public async Task<PagedResponse<TaskResponse>> GetAllAsync(
             bool? isCompleted,
             string? search,
+            string sortBy,
             string sortDirection,
             int pageNumber,
             int pageSize,
@@ -80,16 +81,37 @@ namespace JobTrackr.Infrastructure.Tasks
 
             var skip = (pageNumber - 1) * pageSize;
 
-            var orderedQuery = string.Equals(
-                sortDirection,
-                "asc",
-                StringComparison.OrdinalIgnoreCase)
-                ? query
+            IOrderedQueryable<JobTask> orderedQuery;
+
+            if (string.Equals(sortBy, "dueDate", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(sortDirection, "asc", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderedQuery = query
+                        .OrderBy(task => task.DueDateUtc == null)
+                        .ThenBy(task => task.DueDateUtc)
+                        .ThenBy(task => task.Id);
+                }
+                else
+                {
+                    orderedQuery = query
+                        .OrderBy(task => task.DueDateUtc == null)
+                        .ThenByDescending(task => task.DueDateUtc)
+                        .ThenByDescending(task => task.Id);
+                }
+            }
+            else if (string.Equals(sortDirection, "asc", StringComparison.OrdinalIgnoreCase))
+            {
+                orderedQuery = query
                     .OrderBy(task => task.CreatedAtUtc)
-                    .ThenBy(task => task.Id)
-                : query
+                    .ThenBy(task => task.Id);
+            }
+            else
+            {
+                orderedQuery = query
                     .OrderByDescending(task => task.CreatedAtUtc)
                     .ThenByDescending(task => task.Id);
+            }
 
             var items = await orderedQuery
                 .Skip(skip)

@@ -17,6 +17,7 @@ namespace JobTrackr.Tests.Tasks
             var response = await taskService.GetAllAsync(
                 null,
                 null,
+                "createdAt",
                 "desc",
                 2,
                 2,
@@ -41,6 +42,7 @@ namespace JobTrackr.Tests.Tasks
             var response = await taskService.GetAllAsync(
                 null,
                 null,
+                "createdAt",
                 "desc",
                 1,
                 100,
