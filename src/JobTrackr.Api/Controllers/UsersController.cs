@@ -1,7 +1,9 @@
 using JobTrackr.Application.Common;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JobTrackr.Api.Controllers
 {
@@ -16,6 +18,30 @@ namespace JobTrackr.Api.Controllers
         {
             _userService = userService;
             _taskService = taskService;
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userService.GetByIdAsync(currentUserId.Value);
+
+            if (user is null)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Not Found",
+                    detail: ErrorMessages.UserNotFound);
+            }
+
+            return Ok(user);
         }
 
         [HttpGet]
@@ -116,6 +142,18 @@ namespace JobTrackr.Api.Controllers
             }
 
             return NoContent();
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (int.TryParse(userIdValue, out var userId))
+            {
+                return userId;
+            }
+
+            return null;
         }
     }
 }
