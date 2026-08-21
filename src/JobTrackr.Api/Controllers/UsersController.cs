@@ -44,6 +44,42 @@ namespace JobTrackr.Api.Controllers
             return Ok(user);
         }
 
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateCurrentUser(UpdateUserRequest request)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+
+                if (currentUserId is null)
+                {
+                    return Unauthorized();
+                }
+
+                var response = await _userService.UpdateUserAsync(
+                    currentUserId.Value,
+                    request);
+
+                if (response is null)
+                {
+                    return Problem(
+                        statusCode: StatusCodes.Status404NotFound,
+                        title: "Not Found",
+                        detail: ErrorMessages.UserNotFound);
+                }
+
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Bad Request",
+                    detail: ex.Message);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
