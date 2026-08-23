@@ -9,5 +9,9 @@ namespace JobTrackr.Application.Common
         public const string UserIdRequired = "UserId is required.";
         public const string UserFullNameRequired = "User full name is required.";
         public const string UserEmailRequired = "User email is required.";
+        public const string CurrentPasswordIncorrect = "Current password is incorrect.";
+        public const string NewPasswordMismatch = "New password and confirmation do not match.";
+        public const string NewPasswordMustBeDifferent =
+            "New password must be different from the current password.";
     }
 }

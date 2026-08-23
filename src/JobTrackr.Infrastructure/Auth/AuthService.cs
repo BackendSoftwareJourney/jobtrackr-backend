@@ -1,4 +1,5 @@
 using JobTrackr.Application.Auth;
+using JobTrackr.Application.Common;
 using JobTrackr.Domain.Entities;
 using JobTrackr.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,47 @@ namespace JobTrackr.Infrastructure.Auth
                 Email = user.Email,
                 Token = string.Empty
             };
+        }
+
+        public async Task<bool> ChangePasswordAsync(
+            int userId,
+            ChangePasswordRequest request)
+        {
+            var user = await _dbContext.Users.FindAsync(userId);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            var currentPasswordIsValid = _passwordHasherService.VerifyPassword(
+                request.CurrentPassword,
+                user.PasswordHash);
+
+            if (!currentPasswordIsValid)
+            {
+                throw new ArgumentException(ErrorMessages.CurrentPasswordIncorrect);
+            }
+
+            if (request.NewPassword != request.ConfirmNewPassword)
+            {
+                throw new ArgumentException(ErrorMessages.NewPasswordMismatch);
+            }
+
+            var newPasswordMatchesCurrent = _passwordHasherService.VerifyPassword(
+                request.NewPassword,
+                user.PasswordHash);
+
+            if (newPasswordMatchesCurrent)
+            {
+                throw new ArgumentException(ErrorMessages.NewPasswordMustBeDifferent);
+            }
+
+            user.PasswordHash = _passwordHasherService.HashPassword(request.NewPassword);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
     }
 }
