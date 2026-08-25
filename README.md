@@ -137,14 +137,15 @@ DELETE /api/users/{id}
 - Get By Id returns a task only when the authenticated user owns it.
 - Update changes a task only when the authenticated user owns it.
 - Delete removes a task only when the authenticated user owns it.
+- Complete changes the completion state only when the authenticated user owns the task.
+- Reopen changes the completion state only when the authenticated user owns the task.
 - Missing tasks and tasks owned by another user return `404 Not Found` for ownership-protected operations.
 
 ## Current Authorization Limitations
 
-- Complete and Reopen require authentication but do not yet check task ownership.
 - User CRUD endpoints are not yet protected by authorization.
 
-These limitations are planned future improvements and should not be treated as completed security behavior.
+This limitation is a planned future improvement and should not be treated as completed security behavior.
 
 ## API Reliability Behavior
 
@@ -441,7 +442,6 @@ This project is part of a long-term backend engineering journey focused on:
 
 Planned work includes:
 
-- owner protection for Complete and Reopen
 - stronger authorization for user endpoints
 - Swagger Bearer-token configuration
 - broader controller and integration test coverage

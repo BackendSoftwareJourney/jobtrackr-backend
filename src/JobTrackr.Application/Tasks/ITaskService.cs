@@ -21,9 +21,9 @@ namespace JobTrackr.Application.Tasks
 
         Task<bool> DeleteTaskAsync(int id, int userId);
 
-        Task<TaskResponse?> CompleteTaskAsync(int id);
+        Task<TaskResponse?> CompleteTaskAsync(int id, int userId);
 
-        Task<TaskResponse?> ReopenTaskAsync(int id);
+        Task<TaskResponse?> ReopenTaskAsync(int id, int userId);
 
         Task<List<TaskResponse>?> GetByUserIdAsync(int userId);
     }

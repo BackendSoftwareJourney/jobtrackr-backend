@@ -147,7 +147,16 @@ namespace JobTrackr.Api.Controllers
         [HttpPatch("{id}/complete")]
         public async Task<IActionResult> Complete(int id)
         {
-            var response = await _taskService.CompleteTaskAsync(id);
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var response = await _taskService.CompleteTaskAsync(
+                id,
+                currentUserId.Value);
 
             if (response is null)
             {
@@ -163,7 +172,16 @@ namespace JobTrackr.Api.Controllers
         [HttpPatch("{id}/reopen")]
         public async Task<IActionResult> Reopen(int id)
         {
-            var response = await _taskService.ReopenTaskAsync(id);
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var response = await _taskService.ReopenTaskAsync(
+                id,
+                currentUserId.Value);
 
             if (response is null)
             {

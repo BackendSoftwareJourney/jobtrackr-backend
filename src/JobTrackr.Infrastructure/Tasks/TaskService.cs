@@ -200,9 +200,10 @@ namespace JobTrackr.Infrastructure.Tasks
             return true;
         }
 
-        public async Task<TaskResponse?> CompleteTaskAsync(int id)
+        public async Task<TaskResponse?> CompleteTaskAsync(int id, int userId)
         {
-            var task = await _dbContext.Tasks.FindAsync(id);
+            var task = await _dbContext.Tasks
+                .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
 
             if (task is null)
             {
@@ -216,9 +217,10 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> ReopenTaskAsync(int id)
+        public async Task<TaskResponse?> ReopenTaskAsync(int id, int userId)
         {
-            var task = await _dbContext.Tasks.FindAsync(id);
+            var task = await _dbContext.Tasks
+                .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
 
             if (task is null)
             {
