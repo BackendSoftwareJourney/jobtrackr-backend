@@ -18,6 +18,9 @@ namespace JobTrackr.Api.Controllers
             _taskService = taskService;
         }
 
+        /// <summary>
+        /// Returns the authenticated user's tasks with optional filtering, sorting, and pagination.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] TaskQueryRequest request)
         {
@@ -40,6 +43,9 @@ namespace JobTrackr.Api.Controllers
             return Ok(tasks);
         }
 
+        /// <summary>
+        /// Returns an owned task by id, or not found when it is missing or belongs to another user.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -63,6 +69,9 @@ namespace JobTrackr.Api.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Creates a task for the authenticated user.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create(CreateTaskRequest request)
         {

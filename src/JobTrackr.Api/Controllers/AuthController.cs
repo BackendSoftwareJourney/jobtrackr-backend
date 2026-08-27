@@ -35,6 +35,9 @@ namespace JobTrackr.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Authenticates a user and returns a JWT access token.
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -53,6 +56,9 @@ namespace JobTrackr.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Changes the authenticated user's password after verifying the current password.
+        /// </summary>
         [HttpPut("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
