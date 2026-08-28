@@ -1,4 +1,5 @@
 using JobTrackr.Api.Middleware;
+using JobTrackr.Api.Swagger;
 using JobTrackr.Application.Auth;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
@@ -9,6 +10,7 @@ using JobTrackr.Infrastructure.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 
@@ -24,6 +26,18 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFileName);
 
     options.IncludeXmlComments(xmlFilePath);
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter the JWT token returned by the login endpoint.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    options.OperationFilter<AuthorizeCheckOperationFilter>();
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
