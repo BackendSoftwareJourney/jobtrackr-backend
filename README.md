@@ -24,16 +24,22 @@ The book follows the project from initial solution setup through SQL Server pers
 - Optional task due dates
 - Low, Medium, and High task priority values
 - Task filtering by completion status and title search
+- Task pagination with page metadata
+- Task sorting by creation date and due date
 - Password hashing
 - User registration and login
+- Authenticated password changes
 - JWT token generation
 - JWT-protected task endpoints
+- Authenticated user profile retrieval and update
 - User-owned task creation, listing, retrieval, update, and deletion
 - Global exception handling with safe `ProblemDetails` responses
 - Structured `ProblemDetails` responses for known API errors
 - Request DTO validation with field-level errors
 - Basic request logging for method, path, status code, and elapsed time
 - Public `GET /health` application health endpoint
+- XML endpoint descriptions in Swagger
+- Swagger JWT Bearer authorization support
 - Environment-specific local configuration
 - JWT signing key stored outside Git with .NET User Secrets
 - Documented local SQL Server, migration, HTTPS, and authentication setup
@@ -87,7 +93,10 @@ It is mapped directly in `Program.cs`, so it may not appear in Swagger.
 ```http
 POST /api/auth/register
 POST /api/auth/login
+PUT /api/auth/change-password
 ```
+
+Registration and login are public. Changing a password requires a valid Bearer token for the authenticated user.
 
 ### Tasks
 
@@ -96,9 +105,11 @@ Task endpoints require a valid Bearer token.
 ```http
 GET /api/tasks
 GET /api/tasks?isCompleted=true
-GET /api/tasks?isCompleted=false
 GET /api/tasks?search=resume
-GET /api/tasks?isCompleted=false&search=resume
+GET /api/tasks?sortBy=createdAt&sortDirection=desc
+GET /api/tasks?sortBy=dueDate&sortDirection=asc
+GET /api/tasks?pageNumber=1&pageSize=10
+GET /api/tasks?isCompleted=false&search=resume&sortBy=dueDate&sortDirection=asc&pageNumber=1&pageSize=10
 POST /api/tasks
 GET /api/tasks/{id}
 PUT /api/tasks/{id}
@@ -110,6 +121,8 @@ PATCH /api/tasks/{id}/reopen
 ### Users
 
 ```http
+GET /api/users/me
+PUT /api/users/me
 GET /api/users
 POST /api/users
 GET /api/users/{id}
@@ -117,6 +130,8 @@ GET /api/users/{userId}/tasks
 PUT /api/users/{id}
 DELETE /api/users/{id}
 ```
+
+The `/api/users/me` endpoints require a valid Bearer token and use the authenticated user id from JWT claims. The remaining user-id-based CRUD routes are legacy endpoints and are not yet authorization-protected.
 
 ## Authentication Behavior
 
@@ -126,7 +141,10 @@ DELETE /api/users/{id}
 - Registration currently returns an empty token.
 - Successful login returns a JWT token.
 - Invalid login credentials return a safe authentication error.
-- Protected task endpoints require `Authorization: Bearer TOKEN`.
+- Protected endpoints require a valid `Authorization: Bearer TOKEN` header.
+- An authenticated user can change their password after providing the correct current password.
+- Password confirmation must match, and the new password must differ from the current password.
+- Existing JWTs remain valid until they expire after a password change; token revocation is not implemented yet.
 
 ## Task Ownership Behavior
 
@@ -143,9 +161,11 @@ DELETE /api/users/{id}
 
 ## Current Authorization Limitations
 
-- User CRUD endpoints are not yet protected by authorization.
+- Legacy user CRUD endpoints are not yet protected by authorization.
+- `GET /api/users/{userId}/tasks` accepts a user id from the route and is not yet ownership-protected.
+- Existing JWTs are not revoked after a password change and remain valid until expiration.
 
-This limitation is a planned future improvement and should not be treated as completed security behavior.
+These limitations are planned future improvements and should not be treated as completed security behavior.
 
 ## API Reliability Behavior
 
@@ -182,23 +202,20 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 15 xUnit service tests.
+JobTrackr currently has 34 xUnit service tests.
 
 Current test coverage includes:
 
 - password hashing and verification
-- registration
-- valid login
-- invalid-password login
-- valid task creation
-- empty task title validation
-- existing and missing task retrieval
-- valid task update
-- missing-task update
-- empty-title update validation
-- successful and missing task deletion
-- valid user creation
-- existing user retrieval
+- registration and login behavior
+- valid and invalid password changes
+- task creation, retrieval, update, and deletion
+- task ownership authorization
+- task completion and reopening
+- task pagination and page metadata
+- created-date and due-date sorting
+- combined ownership, filtering, search, sorting, and pagination
+- user creation and retrieval
 
 Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
 
@@ -209,14 +226,15 @@ The current API has also passed a manual regression flow covering health, regist
 From the project root:
 
 ```powershell
-dotnet restore tests\JobTrackr.Tests\JobTrackr.Tests.csproj
-dotnet test tests\JobTrackr.Tests\JobTrackr.Tests.csproj --configuration Release --no-restore
+dotnet restore JobTrackr.slnx
+dotnet build JobTrackr.slnx --configuration Release --no-restore
+dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 ```
 
 Expected result:
 
 ```text
-Passed: 15
+Passed: 34
 Failed: 0
 Skipped: 0
 ```
@@ -278,8 +296,7 @@ From the repository root:
 
 ```powershell
 cd C:\path\to\JobTrackr
-dotnet restore src\JobTrackr.Api\JobTrackr.Api.csproj
-dotnet restore tests\JobTrackr.Tests\JobTrackr.Tests.csproj
+dotnet restore JobTrackr.slnx
 ```
 
 Replace `C:\path\to\JobTrackr` with the actual repository location.
@@ -343,14 +360,14 @@ Accept the Windows trust prompt if it appears.
 ### Build And Test
 
 ```powershell
-dotnet build src\JobTrackr.Api\JobTrackr.Api.csproj --configuration Release
-dotnet test tests\JobTrackr.Tests\JobTrackr.Tests.csproj --configuration Release
+dotnet build JobTrackr.slnx --configuration Release
+dotnet test JobTrackr.slnx --configuration Release --no-build
 ```
 
 Expected test result:
 
 ```text
-Passed: 15
+Passed: 34
 Failed: 0
 Skipped: 0
 ```
@@ -390,17 +407,23 @@ Healthy
 
 ### Test Authentication
 
-1. Call `POST /api/auth/register` to create a user.
+1. Call `POST /api/auth/register` to create a user if needed.
 2. Call `POST /api/auth/login` with the registered email and password.
-3. Copy the JWT token returned by login.
+3. Copy only the JWT value returned in the `token` property.
+4. Select **Authorize** at the top of Swagger UI.
+5. Paste only the JWT token; Swagger adds the `Bearer` prefix automatically.
+6. Select **Authorize** and close the dialog.
+7. Call `GET /api/tasks` or another protected endpoint.
 
-Swagger can be used for registration and login. The current Swagger configuration does not yet provide a Bearer-token **Authorize** button.
+With a valid token, the request succeeds for the authenticated user. After using **Logout** in the Authorize dialog, protected requests return `401 Unauthorized`.
 
-Test the protected task endpoint from PowerShell:
+PowerShell can also be used to test a protected endpoint:
 
 ```powershell
 $token = "PASTE_LOGIN_TOKEN_HERE"
-Invoke-RestMethod -Uri "https://localhost:7024/api/tasks" -Headers @{ Authorization = "Bearer $token" }
+Invoke-RestMethod `
+    -Uri "https://localhost:7024/api/tasks" `
+    -Headers @{ Authorization = "Bearer $token" }
 Remove-Variable token
 ```
 
@@ -443,7 +466,7 @@ This project is part of a long-term backend engineering journey focused on:
 Planned work includes:
 
 - stronger authorization for user endpoints
-- Swagger Bearer-token configuration
+- optional development-only seed data
 - broader controller and integration test coverage
 - database-aware health checks when operationally useful
 - deployment fundamentals
