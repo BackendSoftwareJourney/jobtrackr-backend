@@ -41,6 +41,7 @@ The book follows the project from initial solution setup through SQL Server pers
 - XML endpoint descriptions in Swagger
 - Swagger JWT Bearer authorization support
 - Environment-specific local configuration
+- Optional development-only seed data
 - JWT signing key stored outside Git with .NET User Secrets
 - Documented local SQL Server, migration, HTTPS, and authentication setup
 - xUnit service tests using EF Core InMemory
@@ -347,6 +348,34 @@ The `UserSecretsId` is tracked in the API project file, but the secret value is 
 
 Do not add the JWT key to `appsettings.json`, `appsettings.Development.json`, source code, documentation, or Git.
 
+### Optional Development Seed Data
+
+Development seeding is disabled by default. Apply the existing EF Core migrations first, then enable seeding locally without changing tracked configuration:
+
+```powershell
+dotnet user-secrets set "SeedData:Enabled" "true" --project src\JobTrackr.Api
+dotnet run --project src\JobTrackr.Api --launch-profile https
+```
+
+When the API starts in Development, it creates one sample user and three sample tasks if the seed user does not already exist:
+
+```text
+Email: developer@jobtrackr.local
+Password: Development123!
+```
+
+These credentials are for local development only. Do not reuse them for a real account or production environment. The password is hashed before it is stored in SQL Server.
+
+The seeder checks the dedicated email before inserting data, so restarting the API does not create duplicate sample rows. It runs only when the environment is Development and `SeedData:Enabled` is true. It does not apply migrations or reset the database.
+
+Disable the local override with:
+
+```powershell
+dotnet user-secrets remove "SeedData:Enabled" --project src\JobTrackr.Api
+```
+
+Removing the setting prevents future seed runs but does not delete rows already added to the local database.
+
 ### Trust The Development HTTPS Certificate
 
 Run once on the development machine:
@@ -466,7 +495,6 @@ This project is part of a long-term backend engineering journey focused on:
 Planned work includes:
 
 - stronger authorization for user endpoints
-- optional development-only seed data
 - broader controller and integration test coverage
 - database-aware health checks when operationally useful
 - deployment fundamentals

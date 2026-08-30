@@ -73,6 +73,20 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment()
+    && app.Configuration.GetValue<bool>("SeedData:Enabled"))
+{
+    using var scope = app.Services.CreateScope();
+
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var passwordHasherService = scope.ServiceProvider
+        .GetRequiredService<IPasswordHasherService>();
+
+    await DevelopmentDataSeeder.SeedAsync(
+        dbContext,
+        passwordHasherService);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
