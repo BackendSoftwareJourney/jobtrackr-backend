@@ -376,6 +376,69 @@ dotnet user-secrets remove "SeedData:Enabled" --project src\JobTrackr.Api
 
 Removing the setting prevents future seed runs but does not delete rows already added to the local database.
 
+### Reset The Local Development Database
+
+> **Warning:** This permanently deletes every user and task in the local `JobTrackrDb` database. Use it only for disposable local development data. Never run these commands against a shared or production database.
+
+Stop the running API before resetting the database. Back up any local data you need to keep.
+
+From the repository root, disable optional seed data:
+
+```powershell
+cd C:\path\to\JobTrackr
+dotnet user-secrets remove "SeedData:Enabled" --project .\src\JobTrackr.Api\JobTrackr.Api.csproj
+```
+
+Inspect and validate the tracked Development connection string:
+
+```powershell
+$settings = Get-Content .\src\JobTrackr.Api\appsettings.Development.json | ConvertFrom-Json
+$connectionString = $settings.ConnectionStrings.DefaultConnection
+$connectionString
+
+$isLocalServer = $connectionString -match '(?i)(?:^|;)\s*(?:Server|Data Source)\s*=\s*localhost\s*(?:;|$)'
+$isJobTrackrDatabase = $connectionString -match '(?i)(?:^|;)\s*(?:Database|Initial Catalog)\s*=\s*JobTrackrDb\s*(?:;|$)'
+
+if (!$isLocalServer -or !$isJobTrackrDatabase)
+{
+    throw "Reset stopped: expected the local JobTrackrDb connection string."
+}
+```
+
+The displayed connection string must contain `Server=localhost` and `Database=JobTrackrDb`.
+
+Preview the target using EF Core's interactive confirmation:
+
+```powershell
+dotnet ef database drop --project .\src\JobTrackr.Infrastructure\JobTrackr.Infrastructure.csproj --startup-project .\src\JobTrackr.Api\JobTrackr.Api.csproj
+```
+
+EF Core displays the database and server it is about to delete. Confirm that the prompt names `JobTrackrDb` on `localhost`, then type `N` and press Enter to cancel this first check safely.
+
+When you intentionally want to reset the confirmed local database, run the same command again:
+
+```powershell
+dotnet ef database drop --project .\src\JobTrackr.Infrastructure\JobTrackr.Infrastructure.csproj --startup-project .\src\JobTrackr.Api\JobTrackr.Api.csproj
+```
+
+Type `Y` only when the prompt identifies `JobTrackrDb` on `localhost`. Otherwise, type `N`.
+
+Recreate the empty database by applying all migrations:
+
+```powershell
+dotnet ef database update --project .\src\JobTrackr.Infrastructure\JobTrackr.Infrastructure.csproj --startup-project .\src\JobTrackr.Api\JobTrackr.Api.csproj
+```
+
+Refresh SQL Server Management Studio and confirm `JobTrackrDb` contains:
+
+```text
+dbo.Users
+dbo.Tasks
+dbo.__EFMigrationsHistory
+```
+
+The `Users` and `Tasks` tables should be empty. The migration-history table should contain all five migrations. Development seeding remains disabled unless it is explicitly enabled again through User Secrets.
+
 ### Trust The Development HTTPS Certificate
 
 Run once on the development machine:
