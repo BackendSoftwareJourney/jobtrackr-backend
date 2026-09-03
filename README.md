@@ -44,7 +44,7 @@ The book follows the project from initial solution setup through SQL Server pers
 - Optional development-only seed data
 - JWT signing key stored outside Git with .NET User Secrets
 - Documented local SQL Server, migration, HTTPS, and authentication setup
-- xUnit service tests using EF Core InMemory
+- xUnit service and API integration tests using EF Core InMemory
 - GitHub Actions Release build and automated test execution
 
 ## Architecture
@@ -75,7 +75,7 @@ Contains EF Core database access, migrations, SQL Server service implementations
 
 ### JobTrackr.Tests
 
-Contains xUnit service tests using an isolated EF Core in-memory database.
+Contains xUnit service tests and HTTP integration tests using isolated EF Core in-memory databases.
 
 ## Current Endpoints
 
@@ -203,7 +203,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 34 xUnit service tests.
+JobTrackr currently has 35 xUnit service and API integration tests.
 
 Current test coverage includes:
 
@@ -217,8 +217,11 @@ Current test coverage includes:
 - created-date and due-date sorting
 - combined ownership, filtering, search, sorting, and pagination
 - user creation and retrieval
+- public health endpoint behavior through the ASP.NET Core HTTP pipeline
 
 Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
+
+The health integration test uses `WebApplicationFactory<Program>` to start the API in memory under the Testing environment. It uses test-only configuration and does not require a running API, SQL Server, or local User Secrets.
 
 The current API has also passed a manual regression flow covering health, registration, login, validation, task CRUD and filters, two-user ownership isolation, user CRUD, structured errors, and request logging.
 
@@ -235,7 +238,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 34
+Passed: 35
 Failed: 0
 Skipped: 0
 ```
@@ -459,7 +462,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 34
+Passed: 35
 Failed: 0
 Skipped: 0
 ```

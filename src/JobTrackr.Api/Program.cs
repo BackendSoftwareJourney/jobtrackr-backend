@@ -48,14 +48,14 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
-var jwtKey = builder.Configuration["Jwt:Key"];
-
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+        var jwtAudience = builder.Configuration["Jwt:Audience"];
+        var jwtKey = builder.Configuration["Jwt:Key"];
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -104,3 +104,6 @@ app.MapControllers();
 
 app.Run();
 
+public partial class Program
+{
+}
