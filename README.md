@@ -203,7 +203,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 35 xUnit service and API integration tests.
+JobTrackr currently has 36 xUnit tests: 34 service tests and two API integration tests.
 
 Current test coverage includes:
 
@@ -218,10 +218,11 @@ Current test coverage includes:
 - combined ownership, filtering, search, sorting, and pagination
 - user creation and retrieval
 - public health endpoint behavior through the ASP.NET Core HTTP pipeline
+- registration and login through HTTP, including matching user identity and a non-empty login token
 
 Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
 
-The health integration test uses `WebApplicationFactory<Program>` to start the API in memory under the Testing environment. It uses test-only configuration and does not require a running API, SQL Server, or local User Secrets.
+The health and authentication integration tests use `WebApplicationFactory<Program>` to start the API in memory under the Testing environment. They use test-only configuration and do not require a running API, SQL Server, or local User Secrets. The authentication test verifies a token is returned; using that token against protected task endpoints is planned next.
 
 The current API has also passed a manual regression flow covering health, registration, login, validation, task CRUD and filters, two-user ownership isolation, user CRUD, structured errors, and request logging.
 
@@ -238,7 +239,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 35
+Passed: 36
 Failed: 0
 Skipped: 0
 ```
@@ -462,7 +463,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 35
+Passed: 36
 Failed: 0
 Skipped: 0
 ```
