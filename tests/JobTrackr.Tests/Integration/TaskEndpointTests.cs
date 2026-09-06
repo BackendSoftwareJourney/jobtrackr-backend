@@ -99,6 +99,49 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
         Assert.False(updatedTask.IsCompleted);
     }
 
+    [Fact]
+    public async Task DeleteTask_WithAuthenticatedUser_ReturnsNoContentAndTaskIsNotFound()
+    {
+        using var client = _factory.CreateClient(
+            new WebApplicationFactoryClientOptions
+            {
+                BaseAddress = new Uri("https://localhost")
+            });
+
+        var authenticatedUser = await RegisterAndLoginAsync(client);
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", authenticatedUser.Token);
+
+        var createRequest = new CreateTaskRequest
+        {
+            Title = "Delete integration test task",
+            Description = "This task will be deleted through HTTP.",
+            Priority = "Medium"
+        };
+
+        using var createResponse = await client.PostAsJsonAsync(
+            "/api/tasks",
+            createRequest);
+
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
+        var createdTask = await createResponse.Content
+            .ReadFromJsonAsync<TaskResponse>();
+
+        Assert.NotNull(createdTask);
+
+        using var deleteResponse = await client.DeleteAsync(
+            $"/api/tasks/{createdTask.Id}");
+
+        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        using var getResponse = await client.GetAsync(
+            $"/api/tasks/{createdTask.Id}");
+
+        Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+    }
+
     private static async Task<AuthResponse> RegisterAndLoginAsync(
         HttpClient client)
     {
