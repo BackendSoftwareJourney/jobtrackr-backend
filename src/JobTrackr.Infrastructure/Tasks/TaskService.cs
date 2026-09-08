@@ -79,42 +79,11 @@ namespace JobTrackr.Infrastructure.Tasks
 
             var totalCount = await query.CountAsync();
 
-            var skip = (pageNumber - 1) * pageSize;
+            var tasksToSkip = (pageNumber - 1) * pageSize;
+            var orderedQuery = ApplySorting(query, sortBy, sortDirection);
 
-            IOrderedQueryable<JobTask> orderedQuery;
-
-            if (string.Equals(sortBy, "dueDate", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.Equals(sortDirection, "asc", StringComparison.OrdinalIgnoreCase))
-                {
-                    orderedQuery = query
-                        .OrderBy(task => task.DueDateUtc == null)
-                        .ThenBy(task => task.DueDateUtc)
-                        .ThenBy(task => task.Id);
-                }
-                else
-                {
-                    orderedQuery = query
-                        .OrderBy(task => task.DueDateUtc == null)
-                        .ThenByDescending(task => task.DueDateUtc)
-                        .ThenByDescending(task => task.Id);
-                }
-            }
-            else if (string.Equals(sortDirection, "asc", StringComparison.OrdinalIgnoreCase))
-            {
-                orderedQuery = query
-                    .OrderBy(task => task.CreatedAtUtc)
-                    .ThenBy(task => task.Id);
-            }
-            else
-            {
-                orderedQuery = query
-                    .OrderByDescending(task => task.CreatedAtUtc)
-                    .ThenByDescending(task => task.Id);
-            }
-
-            var items = await orderedQuery
-                .Skip(skip)
+            var taskResponses = await orderedQuery
+                .Skip(tasksToSkip)
                 .Take(pageSize)
                 .Select(task => new TaskResponse
                 {
@@ -133,7 +102,7 @@ namespace JobTrackr.Infrastructure.Tasks
 
             return new PagedResponse<TaskResponse>
             {
-                Items = items,
+                Items = taskResponses,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 TotalCount = totalCount,
@@ -232,6 +201,38 @@ namespace JobTrackr.Infrastructure.Tasks
             await _dbContext.SaveChangesAsync();
 
             return MapToResponse(task);
+        }
+
+        private static IOrderedQueryable<JobTask> ApplySorting(
+            IQueryable<JobTask> query,
+            string sortBy,
+            string sortDirection)
+        {
+            var isAscending = string.Equals(
+                sortDirection,
+                "asc",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (string.Equals(sortBy, "dueDate", StringComparison.OrdinalIgnoreCase))
+            {
+                return isAscending
+                    ? query
+                        .OrderBy(task => task.DueDateUtc == null)
+                        .ThenBy(task => task.DueDateUtc)
+                        .ThenBy(task => task.Id)
+                    : query
+                        .OrderBy(task => task.DueDateUtc == null)
+                        .ThenByDescending(task => task.DueDateUtc)
+                        .ThenByDescending(task => task.Id);
+            }
+
+            return isAscending
+                ? query
+                    .OrderBy(task => task.CreatedAtUtc)
+                    .ThenBy(task => task.Id)
+                : query
+                    .OrderByDescending(task => task.CreatedAtUtc)
+                    .ThenByDescending(task => task.Id);
         }
 
         private static TaskResponse MapToResponse(JobTask task)

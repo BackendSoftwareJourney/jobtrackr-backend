@@ -19,16 +19,9 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
     [Fact]
     public async Task CreateGetAndUpdateTask_WithAuthenticatedUser_ReturnsExpectedResponses()
     {
-        using var client = _factory.CreateClient(
-            new WebApplicationFactoryClientOptions
-            {
-                BaseAddress = new Uri("https://localhost")
-            });
+        using var client = CreateClient();
 
-        var authenticatedUser = await RegisterAndLoginAsync(client);
-
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUser.Token);
+        var authenticatedUser = await AuthenticateClientAsync(client);
 
         var dueDateUtc = DateTime.UtcNow.AddDays(5);
 
@@ -40,15 +33,7 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
             Priority = "High"
         };
 
-        using var createResponse = await client.PostAsJsonAsync(
-            "/api/tasks",
-            createRequest);
-
-        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
-        Assert.NotNull(createResponse.Headers.Location);
-
-        var createdTask = await createResponse.Content
-            .ReadFromJsonAsync<TaskResponse>();
+        var createdTask = await CreateTaskAsync(client, createRequest);
 
         Assert.NotNull(createdTask);
         Assert.True(createdTask.Id > 0);
@@ -102,16 +87,9 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
     [Fact]
     public async Task DeleteTask_WithAuthenticatedUser_ReturnsNoContentAndTaskIsNotFound()
     {
-        using var client = _factory.CreateClient(
-            new WebApplicationFactoryClientOptions
-            {
-                BaseAddress = new Uri("https://localhost")
-            });
+        using var client = CreateClient();
 
-        var authenticatedUser = await RegisterAndLoginAsync(client);
-
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUser.Token);
+        await AuthenticateClientAsync(client);
 
         var createRequest = new CreateTaskRequest
         {
@@ -120,16 +98,7 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
             Priority = "Medium"
         };
 
-        using var createResponse = await client.PostAsJsonAsync(
-            "/api/tasks",
-            createRequest);
-
-        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
-
-        var createdTask = await createResponse.Content
-            .ReadFromJsonAsync<TaskResponse>();
-
-        Assert.NotNull(createdTask);
+        var createdTask = await CreateTaskAsync(client, createRequest);
 
         using var deleteResponse = await client.DeleteAsync(
             $"/api/tasks/{createdTask.Id}");
@@ -140,6 +109,45 @@ public class TaskEndpointTests : IClassFixture<JobTrackrApiFactory>
             $"/api/tasks/{createdTask.Id}");
 
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+    }
+
+    private HttpClient CreateClient()
+    {
+        return _factory.CreateClient(
+            new WebApplicationFactoryClientOptions
+            {
+                BaseAddress = new Uri("https://localhost")
+            });
+    }
+
+    private static async Task<AuthResponse> AuthenticateClientAsync(
+        HttpClient client)
+    {
+        var authenticatedUser = await RegisterAndLoginAsync(client);
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", authenticatedUser.Token);
+
+        return authenticatedUser;
+    }
+
+    private static async Task<TaskResponse> CreateTaskAsync(
+        HttpClient client,
+        CreateTaskRequest request)
+    {
+        using var response = await client.PostAsJsonAsync(
+            "/api/tasks",
+            request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+
+        var createdTask = await response.Content
+            .ReadFromJsonAsync<TaskResponse>();
+
+        Assert.NotNull(createdTask);
+
+        return createdTask;
     }
 
     private static async Task<AuthResponse> RegisterAndLoginAsync(
