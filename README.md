@@ -514,14 +514,96 @@ Healthy
 
 With a valid token, the request succeeds for the authenticated user. After using **Logout** in the Authorize dialog, protected requests return `401 Unauthorized`.
 
-PowerShell can also be used to test a protected endpoint:
+PowerShell can also register a unique test user, log in, and prepare the authorization header used by protected endpoints:
 
 ```powershell
-$token = "PASTE_LOGIN_TOKEN_HERE"
-Invoke-RestMethod `
-    -Uri "https://localhost:7024/api/tasks" `
-    -Headers @{ Authorization = "Bearer $token" }
-Remove-Variable token
+$baseUrl = "https://localhost:7024"
+$email = "readme-$([Guid]::NewGuid().ToString('N'))@example.com"
+$password = "ReadmeTest123!"
+
+$registerBody = @{
+    fullName = "README Test User"
+    email = $email
+    password = $password
+} | ConvertTo-Json
+
+$registeredUser = Invoke-RestMethod `
+    -Uri "$baseUrl/api/auth/register" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body $registerBody
+
+$loginBody = @{
+    email = $email
+    password = $password
+} | ConvertTo-Json
+
+$authenticatedUser = Invoke-RestMethod `
+    -Uri "$baseUrl/api/auth/login" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body $loginBody
+
+$headers = @{
+    Authorization = "Bearer $($authenticatedUser.token)"
+}
+
+$authenticatedUser | Select-Object userId, fullName, email
+```
+
+The GUID creates a different email each time, preventing duplicate-email errors during repeated testing. The password is example-only local test data, not an application signing key or production credential.
+
+The login response contains the authenticated user's id, name, email, and JWT. `$headers` stores that JWT in the format required by protected endpoints.
+
+### Test Task Queries
+
+The following examples reuse `$baseUrl` and `$headers` from the authentication example.
+
+Get the first page using the default created-date descending order:
+
+```powershell
+$tasks = Invoke-RestMethod `
+    -Uri "$baseUrl/api/tasks?pageNumber=1&pageSize=10" `
+    -Method Get `
+    -Headers $headers
+```
+
+Filter incomplete tasks, search titles, sort by due date ascending, and request the first page:
+
+```powershell
+$tasks = Invoke-RestMethod `
+    -Uri "$baseUrl/api/tasks?isCompleted=false&search=resume&sortBy=dueDate&sortDirection=asc&pageNumber=1&pageSize=10" `
+    -Method Get `
+    -Headers $headers
+```
+
+Display pagination metadata:
+
+```powershell
+$tasks | Select-Object pageNumber, pageSize, totalCount, totalPages
+```
+
+Display the returned task items:
+
+```powershell
+$tasks.items | Select-Object id, title, isCompleted, priority, dueDateUtc
+```
+
+An empty page is valid. When no owned task matches the filters, `items` is empty and `totalCount` is `0`.
+
+Query rules:
+
+- `pageNumber` must be at least `1`.
+- `pageSize` must be between `1` and `100`.
+- `sortBy` accepts `createdAt` or `dueDate`.
+- `sortDirection` accepts `asc` or `desc`.
+- Tasks without a due date appear last when sorting by due date.
+- Every result is restricted to the authenticated user.
+
+Remove the temporary authentication values from the PowerShell session when testing is complete:
+
+```powershell
+Remove-Variable registeredUser, authenticatedUser, headers, registerBody, loginBody, password, email
 ```
 
 Without a valid token, protected task endpoints return:
