@@ -12,6 +12,26 @@ The first 90 days of the JobTrackr backend journey are available as a 330-page P
 
 The book follows the project from initial solution setup through SQL Server persistence, authentication, task ownership, testing, continuous integration, reliability improvements, and the Month 3 review.
 
+## Month 4 Milestone
+
+Days 91-120 moved JobTrackr from basic CRUD toward a more predictable and testable backend API.
+
+This phase added:
+
+- authenticated task filtering, title search, and stable server-side pagination
+- created-date and due-date sorting, with tasks without due dates ordered last
+- paged responses containing items, page number, page size, total count, and total pages
+- authenticated profile retrieval and updates
+- secure password changes that verify the current password and store a new hash
+- stronger task ownership checks across protected operations
+- Swagger JWT authorization and clearer endpoint descriptions
+- optional development seed data and safer database reset documentation
+- HTTP integration tests for health, authentication, and authenticated task workflows
+- GitHub Actions execution of the complete service and integration test suite
+- runnable PowerShell examples for authentication and task queries
+
+At the end of Month 4, the project has 38 passing automated tests: 34 service tests and four API integration tests.
+
 ## Current Features
 
 - ASP.NET Core Web API targeting .NET 8
