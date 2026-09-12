@@ -10,7 +10,7 @@ namespace JobTrackr.Tests.Tasks
     public class TaskServiceUpdateTests
     {
         [Fact]
-        public async Task UpdateTaskAsync_WithValidRequest_UpdatesTask()
+        public async Task UpdateAsync_WithValidRequest_UpdatesTask()
         {
             await using var dbContext = CreateDbContext();
             var task = await AddTaskAsync(dbContext);
@@ -23,7 +23,7 @@ namespace JobTrackr.Tests.Tasks
                 Priority = "High"
             };
 
-            var response = await taskService.UpdateTaskAsync(
+            var response = await taskService.UpdateAsync(
                 task.Id,
                 request,
                 task.UserId);
@@ -44,7 +44,7 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task UpdateTaskAsync_WithMissingTask_ReturnsNull()
+        public async Task UpdateAsync_WithMissingTask_ReturnsNull()
         {
             await using var dbContext = CreateDbContext();
             var taskService = new TaskService(dbContext);
@@ -55,13 +55,13 @@ namespace JobTrackr.Tests.Tasks
                 Priority = "Medium"
             };
 
-            var response = await taskService.UpdateTaskAsync(999, request, 1);
+            var response = await taskService.UpdateAsync(999, request, 1);
 
             Assert.Null(response);
         }
 
         [Fact]
-        public async Task UpdateTaskAsync_WithEmptyTitle_ThrowsArgumentException()
+        public async Task UpdateAsync_WithEmptyTitle_ThrowsArgumentException()
         {
             await using var dbContext = CreateDbContext();
             var task = await AddTaskAsync(dbContext);
@@ -75,7 +75,7 @@ namespace JobTrackr.Tests.Tasks
             };
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(
-                () => taskService.UpdateTaskAsync(task.Id, request, task.UserId));
+                () => taskService.UpdateAsync(task.Id, request, task.UserId));
 
             Assert.Equal(ErrorMessages.TaskTitleRequired, exception.Message);
 

@@ -15,7 +15,7 @@ namespace JobTrackr.Infrastructure.Tasks
             _dbContext = dbContext;
         }
 
-        public async Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request, int userId)
+        public async Task<TaskResponse> CreateAsync(CreateTaskRequest request, int userId)
         {
             if (userId <= 0)
             {
@@ -123,7 +123,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> UpdateTaskAsync(int id, UpdateTaskRequest request, int userId)
+        public async Task<TaskResponse?> UpdateAsync(int id, UpdateTaskRequest request, int userId)
         {
             var task = await _dbContext.Tasks
                 .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
@@ -153,7 +153,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<bool> DeleteTaskAsync(int id, int userId)
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
             var task = await _dbContext.Tasks
                 .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
@@ -169,7 +169,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return true;
         }
 
-        public async Task<TaskResponse?> CompleteTaskAsync(int id, int userId)
+        public async Task<TaskResponse?> CompleteAsync(int id, int userId)
         {
             var task = await _dbContext.Tasks
                 .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);
@@ -186,7 +186,7 @@ namespace JobTrackr.Infrastructure.Tasks
             return MapToResponse(task);
         }
 
-        public async Task<TaskResponse?> ReopenTaskAsync(int id, int userId)
+        public async Task<TaskResponse?> ReopenAsync(int id, int userId)
         {
             var task = await _dbContext.Tasks
                 .FirstOrDefaultAsync(task => task.Id == id && task.UserId == userId);

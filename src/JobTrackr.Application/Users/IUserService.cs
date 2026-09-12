@@ -2,14 +2,14 @@ namespace JobTrackr.Application.Users
 {
     public interface IUserService
     {
-        Task<UserResponse> CreateUserAsync(CreateUserRequest request);
+        Task<UserResponse> CreateAsync(CreateUserRequest request);
 
         Task<List<UserResponse>> GetAllAsync();
 
         Task<UserResponse?> GetByIdAsync(int id);
 
-        Task<UserResponse?> UpdateUserAsync(int id, UpdateUserRequest request);
+        Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request);
 
-        Task<bool> DeleteUserAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }

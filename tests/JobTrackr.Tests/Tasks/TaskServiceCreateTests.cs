@@ -10,7 +10,7 @@ namespace JobTrackr.Tests.Tasks
     public class TaskServiceCreateTests
     {
         [Fact]
-        public async Task CreateTaskAsync_WithValidRequest_CreatesTask()
+        public async Task CreateAsync_WithValidRequest_CreatesTask()
         {
             await using var dbContext = CreateDbContext();
             var user = await AddUserAsync(dbContext);
@@ -22,7 +22,7 @@ namespace JobTrackr.Tests.Tasks
                 Priority = "High"
             };
 
-            var response = await taskService.CreateTaskAsync(request, user.Id);
+            var response = await taskService.CreateAsync(request, user.Id);
 
             Assert.Equal(request.Title, response.Title);
             Assert.Equal(request.Description, response.Description);
@@ -33,7 +33,7 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task CreateTaskAsync_WithEmptyTitle_ThrowsArgumentException()
+        public async Task CreateAsync_WithEmptyTitle_ThrowsArgumentException()
         {
             await using var dbContext = CreateDbContext();
             var user = await AddUserAsync(dbContext);
@@ -46,7 +46,7 @@ namespace JobTrackr.Tests.Tasks
             };
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(
-                () => taskService.CreateTaskAsync(request, user.Id));
+                () => taskService.CreateAsync(request, user.Id));
 
             Assert.Equal(ErrorMessages.TaskTitleRequired, exception.Message);
             Assert.Empty(dbContext.Tasks);

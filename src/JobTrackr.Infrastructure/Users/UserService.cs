@@ -15,7 +15,7 @@ namespace JobTrackr.Infrastructure.Users
             _dbContext = dbContext;
         }
 
-        public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
+        public async Task<UserResponse> CreateAsync(CreateUserRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.FullName))
             {
@@ -77,7 +77,7 @@ namespace JobTrackr.Infrastructure.Users
             };
         }
 
-        public async Task<UserResponse?> UpdateUserAsync(int id, UpdateUserRequest request)
+        public async Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.FullName))
             {
@@ -110,7 +110,7 @@ namespace JobTrackr.Infrastructure.Users
             };
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var user = await _dbContext.Users.FindAsync(id);
 

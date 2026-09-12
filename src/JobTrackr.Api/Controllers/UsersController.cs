@@ -57,7 +57,7 @@ namespace JobTrackr.Api.Controllers
                     return Unauthorized();
                 }
 
-                var response = await _userService.UpdateUserAsync(
+                var response = await _userService.UpdateAsync(
                     currentUserId.Value,
                     request);
 
@@ -125,7 +125,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _userService.CreateUserAsync(request);
+                var response = await _userService.CreateAsync(request);
 
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
@@ -143,7 +143,7 @@ namespace JobTrackr.Api.Controllers
         {
             try
             {
-                var response = await _userService.UpdateUserAsync(id, request);
+                var response = await _userService.UpdateAsync(id, request);
 
                 if (response is null)
                 {
@@ -167,7 +167,7 @@ namespace JobTrackr.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _userService.DeleteUserAsync(id);
+            var isDeleted = await _userService.DeleteAsync(id);
 
             if (!isDeleted)
             {

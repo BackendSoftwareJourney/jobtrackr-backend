@@ -8,7 +8,7 @@ namespace JobTrackr.Tests.Users
     public class UserServiceTests
     {
         [Fact]
-        public async Task CreateUserAsync_WithValidRequest_CreatesUser()
+        public async Task CreateAsync_WithValidRequest_CreatesUser()
         {
             await using var dbContext = CreateDbContext();
             var userService = new UserService(dbContext);
@@ -18,7 +18,7 @@ namespace JobTrackr.Tests.Users
                 Email = "create.user@example.com"
             };
 
-            var response = await userService.CreateUserAsync(request);
+            var response = await userService.CreateAsync(request);
 
             Assert.True(response.Id > 0);
             Assert.Equal(request.FullName, response.FullName);
@@ -42,7 +42,7 @@ namespace JobTrackr.Tests.Users
                 Email = "get.user@example.com"
             };
 
-            var createdUser = await userService.CreateUserAsync(createRequest);
+            var createdUser = await userService.CreateAsync(createRequest);
 
             var response = await userService.GetByIdAsync(createdUser.Id);
 

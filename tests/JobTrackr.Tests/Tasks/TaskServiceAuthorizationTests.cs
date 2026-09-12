@@ -23,7 +23,7 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task UpdateTaskAsync_WithAnotherUsersTask_ReturnsNullAndPreservesTask()
+        public async Task UpdateAsync_WithAnotherUsersTask_ReturnsNullAndPreservesTask()
         {
             await using var dbContext = CreateDbContext();
             var testData = await AddUsersAndTaskAsync(dbContext);
@@ -36,7 +36,7 @@ namespace JobTrackr.Tests.Tasks
                 Priority = "High"
             };
 
-            var response = await taskService.UpdateTaskAsync(
+            var response = await taskService.UpdateAsync(
                 testData.Task.Id,
                 request,
                 testData.OtherUser.Id);
@@ -46,13 +46,13 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task DeleteTaskAsync_WithAnotherUsersTask_ReturnsFalseAndPreservesTask()
+        public async Task DeleteAsync_WithAnotherUsersTask_ReturnsFalseAndPreservesTask()
         {
             await using var dbContext = CreateDbContext();
             var testData = await AddUsersAndTaskAsync(dbContext);
             var taskService = new TaskService(dbContext);
 
-            var isDeleted = await taskService.DeleteTaskAsync(
+            var isDeleted = await taskService.DeleteAsync(
                 testData.Task.Id,
                 testData.OtherUser.Id);
 
@@ -62,13 +62,13 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task CompleteTaskAsync_WithAnotherUsersTask_ReturnsNullAndPreservesState()
+        public async Task CompleteAsync_WithAnotherUsersTask_ReturnsNullAndPreservesState()
         {
             await using var dbContext = CreateDbContext();
             var testData = await AddUsersAndTaskAsync(dbContext);
             var taskService = new TaskService(dbContext);
 
-            var response = await taskService.CompleteTaskAsync(
+            var response = await taskService.CompleteAsync(
                 testData.Task.Id,
                 testData.OtherUser.Id);
 
@@ -77,13 +77,13 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task ReopenTaskAsync_WithAnotherUsersTask_ReturnsNullAndPreservesState()
+        public async Task ReopenAsync_WithAnotherUsersTask_ReturnsNullAndPreservesState()
         {
             await using var dbContext = CreateDbContext();
             var testData = await AddUsersAndTaskAsync(dbContext, isCompleted: true);
             var taskService = new TaskService(dbContext);
 
-            var response = await taskService.ReopenTaskAsync(
+            var response = await taskService.ReopenAsync(
                 testData.Task.Id,
                 testData.OtherUser.Id);
 
@@ -92,13 +92,13 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task CompleteAndReopenTaskAsync_WithOwnedTask_UpdatesCompletionState()
+        public async Task CompleteAndReopenAsync_WithOwnedTask_UpdatesCompletionState()
         {
             await using var dbContext = CreateDbContext();
             var testData = await AddUsersAndTaskAsync(dbContext);
             var taskService = new TaskService(dbContext);
 
-            var completedTask = await taskService.CompleteTaskAsync(
+            var completedTask = await taskService.CompleteAsync(
                 testData.Task.Id,
                 testData.Owner.Id);
 
@@ -106,7 +106,7 @@ namespace JobTrackr.Tests.Tasks
             Assert.True(completedTask.IsCompleted);
             Assert.True(testData.Task.IsCompleted);
 
-            var reopenedTask = await taskService.ReopenTaskAsync(
+            var reopenedTask = await taskService.ReopenAsync(
                 testData.Task.Id,
                 testData.Owner.Id);
 

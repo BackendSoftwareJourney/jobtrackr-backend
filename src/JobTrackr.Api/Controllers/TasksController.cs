@@ -84,7 +84,7 @@ namespace JobTrackr.Api.Controllers
                     return Unauthorized();
                 }
 
-                var response = await _taskService.CreateTaskAsync(request, currentUserId.Value);
+                var response = await _taskService.CreateAsync(request, currentUserId.Value);
 
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
@@ -109,7 +109,7 @@ namespace JobTrackr.Api.Controllers
                     return Unauthorized();
                 }
 
-                var response = await _taskService.UpdateTaskAsync(id, request, currentUserId.Value);
+                var response = await _taskService.UpdateAsync(id, request, currentUserId.Value);
 
                 if (response is null)
                 {
@@ -140,7 +140,7 @@ namespace JobTrackr.Api.Controllers
                 return Unauthorized();
             }
 
-            var isDeleted = await _taskService.DeleteTaskAsync(id, currentUserId.Value);
+            var isDeleted = await _taskService.DeleteAsync(id, currentUserId.Value);
 
             if (!isDeleted)
             {
@@ -163,7 +163,7 @@ namespace JobTrackr.Api.Controllers
                 return Unauthorized();
             }
 
-            var response = await _taskService.CompleteTaskAsync(
+            var response = await _taskService.CompleteAsync(
                 id,
                 currentUserId.Value);
 
@@ -188,7 +188,7 @@ namespace JobTrackr.Api.Controllers
                 return Unauthorized();
             }
 
-            var response = await _taskService.ReopenTaskAsync(
+            var response = await _taskService.ReopenAsync(
                 id,
                 currentUserId.Value);
 

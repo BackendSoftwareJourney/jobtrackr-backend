@@ -8,13 +8,13 @@ namespace JobTrackr.Tests.Tasks
     public class TaskServiceDeleteTests
     {
         [Fact]
-        public async Task DeleteTaskAsync_WithExistingOwnedTask_DeletesTask()
+        public async Task DeleteAsync_WithExistingOwnedTask_DeletesTask()
         {
             await using var dbContext = CreateDbContext();
             var task = await AddTaskAsync(dbContext);
             var taskService = new TaskService(dbContext);
 
-            var isDeleted = await taskService.DeleteTaskAsync(
+            var isDeleted = await taskService.DeleteAsync(
                 task.Id,
                 task.UserId);
 
@@ -24,12 +24,12 @@ namespace JobTrackr.Tests.Tasks
         }
 
         [Fact]
-        public async Task DeleteTaskAsync_WithMissingTask_ReturnsFalse()
+        public async Task DeleteAsync_WithMissingTask_ReturnsFalse()
         {
             await using var dbContext = CreateDbContext();
             var taskService = new TaskService(dbContext);
 
-            var isDeleted = await taskService.DeleteTaskAsync(999, 1);
+            var isDeleted = await taskService.DeleteAsync(999, 1);
 
             Assert.False(isDeleted);
         }
