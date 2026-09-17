@@ -82,20 +82,10 @@ namespace JobTrackr.Infrastructure.Tasks
             var tasksToSkip = (pageNumber - 1) * pageSize;
             var orderedQuery = ApplySorting(query, sortBy, sortDirection);
 
-            var taskResponses = await orderedQuery
-                .Skip(tasksToSkip)
-                .Take(pageSize)
-                .Select(task => new TaskResponse
-                {
-                    Id = task.Id,
-                    Description = task.Description,
-                    Title = task.Title,
-                    CreatedAtUtc = task.CreatedAtUtc,
-                    DueDateUtc = task.DueDateUtc,
-                    Priority = task.Priority,
-                    IsCompleted = task.IsCompleted,
-                    UserId = task.UserId
-                })
+            var taskResponses = await ProjectToResponses(
+                    orderedQuery
+                        .Skip(tasksToSkip)
+                        .Take(pageSize))
                 .ToListAsync();
 
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
@@ -235,6 +225,21 @@ namespace JobTrackr.Infrastructure.Tasks
                     .ThenByDescending(task => task.Id);
         }
 
+        private static IQueryable<TaskResponse> ProjectToResponses(IQueryable<JobTask> query)
+        {
+            return query.Select(task => new TaskResponse
+            {
+                Id = task.Id,
+                Description = task.Description,
+                Title = task.Title,
+                CreatedAtUtc = task.CreatedAtUtc,
+                DueDateUtc = task.DueDateUtc,
+                Priority = task.Priority,
+                IsCompleted = task.IsCompleted,
+                UserId = task.UserId
+            });
+        }
+
         private static TaskResponse MapToResponse(JobTask task)
         {
             return new TaskResponse
@@ -259,9 +264,8 @@ namespace JobTrackr.Infrastructure.Tasks
                 return null;
             }
 
-            return await _dbContext.Tasks
-                .Where(task => task.UserId == userId)
-                .Select(task => MapToResponse(task))
+            return await ProjectToResponses(
+                    _dbContext.Tasks.Where(task => task.UserId == userId))
                 .ToListAsync();
         }
     }
