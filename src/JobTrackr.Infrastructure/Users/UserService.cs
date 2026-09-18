@@ -37,25 +37,12 @@ namespace JobTrackr.Infrastructure.Users
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            return new UserResponse
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                CreatedAtUtc = user.CreatedAtUtc
-            };
+            return MapToResponse(user);
         }
 
         public async Task<List<UserResponse>> GetAllAsync()
         {
-            return await _dbContext.Users
-                .Select(user => new UserResponse
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    CreatedAtUtc = user.CreatedAtUtc
-                })
+            return await ProjectToResponses(_dbContext.Users)
                 .ToListAsync();
         }
 
@@ -68,13 +55,7 @@ namespace JobTrackr.Infrastructure.Users
                 return null;
             }
 
-            return new UserResponse
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                CreatedAtUtc = user.CreatedAtUtc
-            };
+            return MapToResponse(user);
         }
 
         public async Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request)
@@ -101,13 +82,7 @@ namespace JobTrackr.Infrastructure.Users
 
             await _dbContext.SaveChangesAsync();
 
-            return new UserResponse
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                CreatedAtUtc = user.CreatedAtUtc
-            };
+            return MapToResponse(user);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -123,6 +98,28 @@ namespace JobTrackr.Infrastructure.Users
             await _dbContext.SaveChangesAsync();
 
             return true;
+        }
+
+        private static IQueryable<UserResponse> ProjectToResponses(IQueryable<User> query)
+        {
+            return query.Select(user => new UserResponse
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                CreatedAtUtc = user.CreatedAtUtc
+            });
+        }
+
+        private static UserResponse MapToResponse(User user)
+        {
+            return new UserResponse
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                CreatedAtUtc = user.CreatedAtUtc
+            };
         }
     }
 }
