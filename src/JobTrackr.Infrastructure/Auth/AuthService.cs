@@ -40,13 +40,7 @@ namespace JobTrackr.Infrastructure.Auth
 
             var token = _jwtTokenService.GenerateToken(user);
 
-            return new AuthResponse
-            {
-                UserId = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = token
-            };
+            return MapToResponse(user, token);
         }
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -69,13 +63,7 @@ namespace JobTrackr.Infrastructure.Auth
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            return new AuthResponse
-            {
-                UserId = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = string.Empty
-            };
+            return MapToResponse(user, string.Empty);
         }
 
         public async Task<bool> ChangePasswordAsync(
@@ -117,6 +105,17 @@ namespace JobTrackr.Infrastructure.Auth
             await _dbContext.SaveChangesAsync();
 
             return true;
+        }
+
+        private static AuthResponse MapToResponse(User user, string token)
+        {
+            return new AuthResponse
+            {
+                UserId = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Token = token
+            };
         }
     }
 }
