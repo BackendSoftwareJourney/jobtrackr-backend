@@ -115,6 +115,38 @@ namespace JobTrackr.Tests.Tasks
             Assert.False(testData.Task.IsCompleted);
         }
 
+        [Fact]
+        public async Task CompleteAsync_WithAlreadyCompletedOwnedTask_RemainsCompleted()
+        {
+            await using var dbContext = CreateDbContext();
+            var testData = await AddUsersAndTaskAsync(dbContext, isCompleted: true);
+            var taskService = new TaskService(dbContext);
+
+            var response = await taskService.CompleteAsync(
+                testData.Task.Id,
+                testData.Owner.Id);
+
+            Assert.NotNull(response);
+            Assert.True(response.IsCompleted);
+            Assert.True(testData.Task.IsCompleted);
+        }
+
+        [Fact]
+        public async Task ReopenAsync_WithAlreadyOpenOwnedTask_RemainsOpen()
+        {
+            await using var dbContext = CreateDbContext();
+            var testData = await AddUsersAndTaskAsync(dbContext);
+            var taskService = new TaskService(dbContext);
+
+            var response = await taskService.ReopenAsync(
+                testData.Task.Id,
+                testData.Owner.Id);
+
+            Assert.NotNull(response);
+            Assert.False(response.IsCompleted);
+            Assert.False(testData.Task.IsCompleted);
+        }
+
         private static AppDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()

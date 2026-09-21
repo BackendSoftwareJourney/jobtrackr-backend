@@ -30,7 +30,7 @@ This phase added:
 - GitHub Actions execution of the complete service and integration test suite
 - runnable PowerShell examples for authentication and task queries
 
-At the end of Month 4, the project has 38 passing automated tests: 34 service tests and four API integration tests.
+The project has 40 passing automated tests: 36 service tests and four API integration tests.
 
 ## Current Features
 
@@ -178,6 +178,7 @@ The `/api/users/me` endpoints require a valid Bearer token and use the authentic
 - Delete removes a task only when the authenticated user owns it.
 - Complete changes the completion state only when the authenticated user owns the task.
 - Reopen changes the completion state only when the authenticated user owns the task.
+- Complete and reopen are idempotent: repeating either request returns the same desired completion state.
 - Missing tasks and tasks owned by another user return `404 Not Found` for ownership-protected operations.
 
 ## Current Authorization Limitations
@@ -223,7 +224,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 38 xUnit tests: 34 service tests and four API integration tests.
+JobTrackr currently has 40 xUnit tests: 36 service tests and four API integration tests.
 
 Current test coverage includes:
 
@@ -260,7 +261,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 38
+Passed: 40
 Failed: 0
 Skipped: 0
 ```
@@ -484,7 +485,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 38
+Passed: 40
 Failed: 0
 Skipped: 0
 ```
