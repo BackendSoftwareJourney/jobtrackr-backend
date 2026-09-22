@@ -30,7 +30,7 @@ This phase added:
 - GitHub Actions execution of the complete service and integration test suite
 - runnable PowerShell examples for authentication and task queries
 
-The project has 40 passing automated tests: 36 service tests and four API integration tests.
+The project has 42 passing automated tests: 38 service tests and four API integration tests.
 
 ## Current Features
 
@@ -41,7 +41,7 @@ The project has 40 passing automated tests: 36 service tests and four API integr
 - User CRUD endpoints
 - Task CRUD endpoints
 - Task completion and reopen endpoints
-- Optional task due dates
+- Optional future task due dates
 - Low, Medium, and High task priority values
 - Task filtering by completion status and title search
 - Task pagination with page metadata
@@ -224,7 +224,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 40 xUnit tests: 36 service tests and four API integration tests.
+JobTrackr currently has 42 xUnit tests: 38 service tests and four API integration tests.
 
 Current test coverage includes:
 
@@ -234,6 +234,7 @@ Current test coverage includes:
 - task creation, retrieval, update, and deletion
 - task ownership authorization
 - task completion and reopening
+- task due-date validation
 - task pagination and page metadata
 - created-date and due-date sorting
 - combined ownership, filtering, search, sorting, and pagination
@@ -261,7 +262,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 40
+Passed: 42
 Failed: 0
 Skipped: 0
 ```
@@ -485,7 +486,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 40
+Passed: 42
 Failed: 0
 Skipped: 0
 ```

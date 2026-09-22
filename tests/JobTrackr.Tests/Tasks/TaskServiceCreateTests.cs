@@ -52,6 +52,27 @@ namespace JobTrackr.Tests.Tasks
             Assert.Empty(dbContext.Tasks);
         }
 
+        [Fact]
+        public async Task CreateAsync_WithPastDueDate_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var user = await AddUserAsync(dbContext);
+            var taskService = new TaskService(dbContext);
+            var request = new CreateTaskRequest
+            {
+                Title = "Task with past due date",
+                Description = "This task should not be saved",
+                DueDateUtc = DateTime.UtcNow.AddDays(-1),
+                Priority = "Medium"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => taskService.CreateAsync(request, user.Id));
+
+            Assert.Equal(ErrorMessages.TaskDueDateMustBeFuture, exception.Message);
+            Assert.Empty(dbContext.Tasks);
+        }
+
         private static AppDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()

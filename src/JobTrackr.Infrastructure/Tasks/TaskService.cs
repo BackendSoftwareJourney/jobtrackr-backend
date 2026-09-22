@@ -39,6 +39,8 @@ namespace JobTrackr.Infrastructure.Tasks
                 throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
 
+            ValidateDueDate(request.DueDateUtc);
+
             var task = new JobTask()
             {
                 Description = request.Description,
@@ -132,6 +134,8 @@ namespace JobTrackr.Infrastructure.Tasks
             {
                 throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
+
+            ValidateDueDate(request.DueDateUtc);
 
             task.Title = request.Title;
             task.Description = request.Description;
@@ -253,6 +257,14 @@ namespace JobTrackr.Infrastructure.Tasks
                 IsCompleted = task.IsCompleted,
                 UserId = task.UserId
             };
+        }
+
+        private static void ValidateDueDate(DateTime? dueDateUtc)
+        {
+            if (dueDateUtc.HasValue && dueDateUtc.Value <= DateTime.UtcNow)
+            {
+                throw new ArgumentException(ErrorMessages.TaskDueDateMustBeFuture);
+            }
         }
 
         public async Task<List<TaskResponse>?> GetByUserIdAsync(int userId)

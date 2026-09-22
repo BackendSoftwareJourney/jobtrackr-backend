@@ -84,6 +84,31 @@ namespace JobTrackr.Tests.Tasks
             Assert.Equal(originalTitle, savedTask.Title);
         }
 
+        [Fact]
+        public async Task UpdateAsync_WithPastDueDate_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var task = await AddTaskAsync(dbContext);
+            var originalDueDateUtc = task.DueDateUtc;
+            var taskService = new TaskService(dbContext);
+            var request = new UpdateTaskRequest
+            {
+                Title = "Updated task title",
+                Description = "This update should fail",
+                DueDateUtc = DateTime.UtcNow.AddDays(-1),
+                Priority = "Medium"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => taskService.UpdateAsync(task.Id, request, task.UserId));
+
+            Assert.Equal(ErrorMessages.TaskDueDateMustBeFuture, exception.Message);
+
+            var savedTask = await dbContext.Tasks.SingleAsync();
+
+            Assert.Equal(originalDueDateUtc, savedTask.DueDateUtc);
+        }
+
         private static AppDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
