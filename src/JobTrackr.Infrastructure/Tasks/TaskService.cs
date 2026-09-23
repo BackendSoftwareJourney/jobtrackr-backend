@@ -39,6 +39,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
 
+            ValidatePriority(request.Priority);
             ValidateDueDate(request.DueDateUtc);
 
             var task = new JobTask()
@@ -135,6 +136,7 @@ namespace JobTrackr.Infrastructure.Tasks
                 throw new ArgumentException(ErrorMessages.TaskPriorityRequired);
             }
 
+            ValidatePriority(request.Priority);
             ValidateDueDate(request.DueDateUtc);
 
             task.Title = request.Title;
@@ -257,6 +259,16 @@ namespace JobTrackr.Infrastructure.Tasks
                 IsCompleted = task.IsCompleted,
                 UserId = task.UserId
             };
+        }
+
+        private static void ValidatePriority(string priority)
+        {
+            if (priority != "Low" &&
+                priority != "Medium" &&
+                priority != "High")
+            {
+                throw new ArgumentException(ErrorMessages.TaskPriorityInvalid);
+            }
         }
 
         private static void ValidateDueDate(DateTime? dueDateUtc)

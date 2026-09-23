@@ -6,6 +6,8 @@ namespace JobTrackr.Application.Common
         public const string TaskNotFound = "Task not found.";
         public const string TaskTitleRequired = "Task title is required.";
         public const string TaskPriorityRequired = "Task priority is required.";
+        public const string TaskPriorityInvalid =
+            "Task priority must be Low, Medium, or High.";
         public const string TaskDueDateMustBeFuture =
             "Task due date must be in the future.";
         public const string UserIdRequired = "UserId is required.";

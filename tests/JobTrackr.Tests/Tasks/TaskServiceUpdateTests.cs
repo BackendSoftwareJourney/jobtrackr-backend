@@ -109,6 +109,30 @@ namespace JobTrackr.Tests.Tasks
             Assert.Equal(originalDueDateUtc, savedTask.DueDateUtc);
         }
 
+        [Fact]
+        public async Task UpdateAsync_WithInvalidPriority_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var task = await AddTaskAsync(dbContext);
+            var originalPriority = task.Priority;
+            var taskService = new TaskService(dbContext);
+            var request = new UpdateTaskRequest
+            {
+                Title = "Updated task title",
+                Description = "This update should fail",
+                Priority = "Urgent"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => taskService.UpdateAsync(task.Id, request, task.UserId));
+
+            Assert.Equal(ErrorMessages.TaskPriorityInvalid, exception.Message);
+
+            var savedTask = await dbContext.Tasks.SingleAsync();
+
+            Assert.Equal(originalPriority, savedTask.Priority);
+        }
+
         private static AppDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()

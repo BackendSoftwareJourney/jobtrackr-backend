@@ -73,6 +73,26 @@ namespace JobTrackr.Tests.Tasks
             Assert.Empty(dbContext.Tasks);
         }
 
+        [Fact]
+        public async Task CreateAsync_WithInvalidPriority_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var user = await AddUserAsync(dbContext);
+            var taskService = new TaskService(dbContext);
+            var request = new CreateTaskRequest
+            {
+                Title = "Task with invalid priority",
+                Description = "This task should not be saved",
+                Priority = "Urgent"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => taskService.CreateAsync(request, user.Id));
+
+            Assert.Equal(ErrorMessages.TaskPriorityInvalid, exception.Message);
+            Assert.Empty(dbContext.Tasks);
+        }
+
         private static AppDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
