@@ -9,7 +9,7 @@ namespace JobTrackr.Application.Users
         public string FullName { get; set; } = string.Empty;
 
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Email is not valid.")]
         [MaxLength(200)]
         public string Email { get; set; } = string.Empty;
     }

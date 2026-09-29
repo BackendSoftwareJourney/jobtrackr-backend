@@ -23,6 +23,7 @@ This phase added:
 - paged responses containing items, page number, page size, total count, and total pages
 - authenticated profile retrieval and updates
 - secure password changes that verify the current password and store a new hash
+- consistent email format, normalization, and duplicate validation
 - stronger task ownership checks across protected operations
 - Swagger JWT authorization and clearer endpoint descriptions
 - optional development seed data and safer database reset documentation
@@ -30,7 +31,7 @@ This phase added:
 - GitHub Actions execution of the complete service and integration test suite
 - runnable PowerShell examples for authentication and task queries
 
-The project has 44 passing automated tests: 40 service tests and four API integration tests.
+The project has 49 passing automated tests: 45 service tests and four API integration tests.
 
 ## Current Features
 
@@ -156,7 +157,10 @@ The `/api/users/me` endpoints require a valid Bearer token and use the authentic
 
 ## Authentication Behavior
 
-- Registration rejects an email that is already registered.
+- Registration and legacy user create/update workflows validate email format.
+- Email comparison is case-insensitive, and newly saved emails are normalized to lowercase.
+- Registration and user creation reject an email that is already in use.
+- User updates reject another user's email while allowing the current email.
 - Passwords are hashed before they are stored.
 - Authentication responses do not expose passwords or password hashes.
 - Registration currently returns an empty token.
@@ -224,12 +228,13 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 44 xUnit tests: 40 service tests and four API integration tests.
+JobTrackr currently has 49 xUnit tests: 45 service tests and four API integration tests.
 
 Current test coverage includes:
 
 - password hashing and verification
 - registration and login behavior
+- invalid and case-insensitive duplicate email behavior
 - valid and invalid password changes
 - task creation, retrieval, update, and deletion
 - task ownership authorization
@@ -263,7 +268,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 44
+Passed: 49
 Failed: 0
 Skipped: 0
 ```
@@ -487,7 +492,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 44
+Passed: 49
 Failed: 0
 Skipped: 0
 ```

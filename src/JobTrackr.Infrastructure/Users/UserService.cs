@@ -27,10 +27,24 @@ namespace JobTrackr.Infrastructure.Users
                 throw new ArgumentException(ErrorMessages.UserEmailRequired);
             }
 
+            if (!EmailValidation.IsValid(request.Email))
+            {
+                throw new ArgumentException(ErrorMessages.EmailInvalid);
+            }
+
+            var normalizedEmail = EmailValidation.Normalize(request.Email);
+            var emailExists = await _dbContext.Users.AnyAsync(
+                user => user.Email.ToLower() == normalizedEmail);
+
+            if (emailExists)
+            {
+                throw new ArgumentException(ErrorMessages.EmailAlreadyInUse);
+            }
+
             var user = new User()
             {
                 FullName = request.FullName,
-                Email = request.Email,
+                Email = normalizedEmail,
                 CreatedAtUtc = DateTime.UtcNow
             };
 
@@ -70,6 +84,13 @@ namespace JobTrackr.Infrastructure.Users
                 throw new ArgumentException(ErrorMessages.UserEmailRequired);
             }
 
+            if (!EmailValidation.IsValid(request.Email))
+            {
+                throw new ArgumentException(ErrorMessages.EmailInvalid);
+            }
+
+            var normalizedEmail = EmailValidation.Normalize(request.Email);
+
             var user = await _dbContext.Users.FindAsync(id);
 
             if (user is null)
@@ -77,8 +98,17 @@ namespace JobTrackr.Infrastructure.Users
                 return null;
             }
 
+            var emailExists = await _dbContext.Users.AnyAsync(
+                existingUser => existingUser.Id != id &&
+                    existingUser.Email.ToLower() == normalizedEmail);
+
+            if (emailExists)
+            {
+                throw new ArgumentException(ErrorMessages.EmailAlreadyInUse);
+            }
+
             user.FullName = request.FullName;
-            user.Email = request.Email;
+            user.Email = normalizedEmail;
 
             await _dbContext.SaveChangesAsync();
 

@@ -42,6 +42,52 @@ namespace JobTrackr.Tests.Auth
         }
 
         [Fact]
+        public async Task RegisterAsync_WithInvalidEmail_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var authService = CreateAuthService(dbContext);
+            var request = new RegisterRequest
+            {
+                FullName = "Invalid Email User",
+                Email = "not-an-email",
+                Password = "Password123"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => authService.RegisterAsync(request));
+
+            Assert.Equal(ErrorMessages.EmailInvalid, exception.Message);
+            Assert.Empty(dbContext.Users);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_WithDuplicateEmail_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var authService = CreateAuthService(dbContext);
+
+            await authService.RegisterAsync(new RegisterRequest
+            {
+                FullName = "First User",
+                Email = "duplicate@example.com",
+                Password = "Password123"
+            });
+
+            var duplicateRequest = new RegisterRequest
+            {
+                FullName = "Second User",
+                Email = "DUPLICATE@example.com",
+                Password = "Password456"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => authService.RegisterAsync(duplicateRequest));
+
+            Assert.Equal(ErrorMessages.EmailAlreadyInUse, exception.Message);
+            Assert.Equal(1, await dbContext.Users.CountAsync());
+        }
+
+        [Fact]
         public async Task LoginAsync_WithValidCredentials_ReturnsAuthResponse()
         {
             await using var dbContext = CreateDbContext();

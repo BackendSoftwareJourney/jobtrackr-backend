@@ -24,7 +24,9 @@ namespace JobTrackr.Infrastructure.Auth
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
+            var normalizedEmail = EmailValidation.Normalize(request.Email);
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Email.ToLower() == normalizedEmail);
 
             if (user is null)
             {
@@ -45,16 +47,28 @@ namespace JobTrackr.Infrastructure.Auth
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
-            var emailExists = await _dbContext.Users.AnyAsync(user => user.Email == request.Email);
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                throw new ArgumentException(ErrorMessages.UserEmailRequired);
+            }
+
+            if (!EmailValidation.IsValid(request.Email))
+            {
+                throw new ArgumentException(ErrorMessages.EmailInvalid);
+            }
+
+            var normalizedEmail = EmailValidation.Normalize(request.Email);
+            var emailExists = await _dbContext.Users.AnyAsync(
+                user => user.Email.ToLower() == normalizedEmail);
 
             if (emailExists)
             {
-                throw new ArgumentException("Email is already registered.");
+                throw new ArgumentException(ErrorMessages.EmailAlreadyInUse);
             }
 
             var user = new User
             {
-                Email = request.Email,
+                Email = normalizedEmail,
                 FullName = request.FullName,
                 PasswordHash = _passwordHasherService.HashPassword(request.Password),
                 CreatedAtUtc = DateTime.UtcNow
