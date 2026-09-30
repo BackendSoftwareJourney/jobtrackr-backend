@@ -1,3 +1,4 @@
+using JobTrackr.Application.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobTrackr.Application.Auth
@@ -14,7 +15,12 @@ namespace JobTrackr.Application.Auth
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required.")]
-        [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+        [MinLength(
+            PasswordValidation.MinimumLength,
+            ErrorMessage = ErrorMessages.PasswordMinimumLength)]
+        [RegularExpression(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$",
+            ErrorMessage = ErrorMessages.PasswordComplexity)]
         [MaxLength(100, ErrorMessage = "Password cannot be longer than 100 characters.")]
         public string Password { get; set; } = string.Empty;
     }

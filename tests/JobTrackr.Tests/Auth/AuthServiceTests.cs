@@ -88,6 +88,44 @@ namespace JobTrackr.Tests.Auth
         }
 
         [Fact]
+        public async Task RegisterAsync_WithShortPassword_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var authService = CreateAuthService(dbContext);
+            var request = new RegisterRequest
+            {
+                FullName = "Short Password User",
+                Email = "short.password@example.com",
+                Password = "Pass1"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => authService.RegisterAsync(request));
+
+            Assert.Equal(ErrorMessages.PasswordMinimumLength, exception.Message);
+            Assert.Empty(dbContext.Users);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_WithoutBasicPasswordComplexity_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var authService = CreateAuthService(dbContext);
+            var request = new RegisterRequest
+            {
+                FullName = "Weak Password User",
+                Email = "weak.password@example.com",
+                Password = "password"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => authService.RegisterAsync(request));
+
+            Assert.Equal(ErrorMessages.PasswordComplexity, exception.Message);
+            Assert.Empty(dbContext.Users);
+        }
+
+        [Fact]
         public async Task LoginAsync_WithValidCredentials_ReturnsAuthResponse()
         {
             await using var dbContext = CreateDbContext();
@@ -287,6 +325,30 @@ namespace JobTrackr.Tests.Auth
 
             Assert.False(passwordChanged);
             Assert.Empty(dbContext.Users);
+        }
+
+        [Fact]
+        public async Task ChangePasswordAsync_WithWeakNewPassword_ThrowsArgumentException()
+        {
+            await using var dbContext = CreateDbContext();
+            var authService = CreateAuthService(dbContext);
+            var registeredUser = await RegisterChangePasswordUserAsync(authService);
+            var savedUser = await dbContext.Users.SingleAsync();
+            var originalPasswordHash = savedUser.PasswordHash;
+            var request = new ChangePasswordRequest
+            {
+                CurrentPassword = "Password123",
+                NewPassword = "newpassword",
+                ConfirmNewPassword = "newpassword"
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => authService.ChangePasswordAsync(
+                    registeredUser.UserId,
+                    request));
+
+            Assert.Equal(ErrorMessages.PasswordComplexity, exception.Message);
+            Assert.Equal(originalPasswordHash, savedUser.PasswordHash);
         }
 
         private static Task<AuthResponse> RegisterChangePasswordUserAsync(

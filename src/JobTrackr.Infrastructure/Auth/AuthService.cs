@@ -47,6 +47,8 @@ namespace JobTrackr.Infrastructure.Auth
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
+            ValidatePassword(request.Password);
+
             if (string.IsNullOrWhiteSpace(request.Email))
             {
                 throw new ArgumentException(ErrorMessages.UserEmailRequired);
@@ -105,6 +107,8 @@ namespace JobTrackr.Infrastructure.Auth
                 throw new ArgumentException(ErrorMessages.NewPasswordMismatch);
             }
 
+            ValidatePassword(request.NewPassword);
+
             var newPasswordMatchesCurrent = _passwordHasherService.VerifyPassword(
                 request.NewPassword,
                 user.PasswordHash);
@@ -121,6 +125,18 @@ namespace JobTrackr.Infrastructure.Auth
             return true;
         }
 
+        private static void ValidatePassword(string password)
+        {
+            if (!PasswordValidation.HasMinimumLength(password))
+            {
+                throw new ArgumentException(ErrorMessages.PasswordMinimumLength);
+            }
+
+            if (!PasswordValidation.HasBasicComplexity(password))
+            {
+                throw new ArgumentException(ErrorMessages.PasswordComplexity);
+            }
+        }
         private static AuthResponse MapToResponse(User user, string token)
         {
             return new AuthResponse

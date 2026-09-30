@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using JobTrackr.Application.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace JobTrackr.Application.Auth
 {
@@ -9,7 +10,12 @@ namespace JobTrackr.Application.Auth
         public string CurrentPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "New password is required.")]
-        [MinLength(6, ErrorMessage = "New password must be at least 6 characters.")]
+        [MinLength(
+            PasswordValidation.MinimumLength,
+            ErrorMessage = ErrorMessages.PasswordMinimumLength)]
+        [RegularExpression(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$",
+            ErrorMessage = ErrorMessages.PasswordComplexity)]
         [MaxLength(100, ErrorMessage = "New password cannot be longer than 100 characters.")]
         public string NewPassword { get; set; } = string.Empty;
 

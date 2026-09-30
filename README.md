@@ -31,7 +31,7 @@ This phase added:
 - GitHub Actions execution of the complete service and integration test suite
 - runnable PowerShell examples for authentication and task queries
 
-The project has 49 passing automated tests: 45 service tests and four API integration tests.
+The project has 52 passing automated tests: 48 service tests and four API integration tests.
 
 ## Current Features
 
@@ -169,6 +169,8 @@ The `/api/users/me` endpoints require a valid Bearer token and use the authentic
 - Protected endpoints require a valid `Authorization: Bearer TOKEN` header.
 - An authenticated user can change their password after providing the correct current password.
 - Password confirmation must match, and the new password must differ from the current password.
+- Registration and new passwords require at least eight characters, including uppercase,
+  lowercase, and numeric characters.
 - Existing JWTs remain valid until they expire after a password change; token revocation is not implemented yet.
 
 ## Task Ownership Behavior
@@ -228,7 +230,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 49 xUnit tests: 45 service tests and four API integration tests.
+JobTrackr currently has 52 xUnit tests: 48 service tests and four API integration tests.
 
 Current test coverage includes:
 
@@ -236,6 +238,7 @@ Current test coverage includes:
 - registration and login behavior
 - invalid and case-insensitive duplicate email behavior
 - valid and invalid password changes
+- password length and basic complexity validation
 - task creation, retrieval, update, and deletion
 - task ownership authorization
 - task completion and reopening
@@ -268,7 +271,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 49
+Passed: 52
 Failed: 0
 Skipped: 0
 ```
@@ -492,7 +495,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 49
+Passed: 52
 Failed: 0
 Skipped: 0
 ```

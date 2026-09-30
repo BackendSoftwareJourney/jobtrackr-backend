@@ -15,6 +15,10 @@ namespace JobTrackr.Application.Common
         public const string UserEmailRequired = "User email is required.";
         public const string EmailInvalid = "Email is not valid.";
         public const string EmailAlreadyInUse = "Email is already in use.";
+        public const string PasswordMinimumLength =
+            "Password must be at least 8 characters.";
+        public const string PasswordComplexity =
+            "Password must contain an uppercase letter, a lowercase letter, and a number.";
         public const string CurrentPasswordIncorrect = "Current password is incorrect.";
         public const string NewPasswordMismatch = "New password and confirmation do not match.";
         public const string NewPasswordMustBeDifferent =
