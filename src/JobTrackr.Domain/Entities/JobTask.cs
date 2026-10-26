@@ -19,5 +19,7 @@ namespace JobTrackr.Domain.Entities
         public int UserId { get; set; }
 
         public User? User { get; set; }
+
+        public List<TaskComment> Comments { get; set; } = [];
     }
 }

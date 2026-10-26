@@ -61,6 +61,32 @@ namespace JobTrackr.Infrastructure.Persistence.Migrations
                     b.ToTable("Tasks");
                 });
 
+            modelBuilder.Entity("JobTrackr.Domain.Entities.TaskComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TaskComments");
+                });
+
             modelBuilder.Entity("JobTrackr.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +124,22 @@ namespace JobTrackr.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("JobTrackr.Domain.Entities.TaskComment", b =>
+                {
+                    b.HasOne("JobTrackr.Domain.Entities.JobTask", "Task")
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("JobTrackr.Domain.Entities.JobTask", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("JobTrackr.Domain.Entities.User", b =>

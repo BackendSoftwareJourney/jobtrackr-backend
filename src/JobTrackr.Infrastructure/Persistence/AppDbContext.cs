@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
 
     public DbSet<JobTask> Tasks { get; set; }
 
+    public DbSet<TaskComment> TaskComments { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -21,6 +22,18 @@ public class AppDbContext : DbContext
             .HasOne(task => task.User)
             .WithMany(user => user.Tasks)
             .HasForeignKey(task => task.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TaskComment>()
+           .Property(comment => comment.Content)
+           .IsRequired()
+           .HasMaxLength(1000);
+
+        modelBuilder.Entity<TaskComment>()
+            .HasOne(comment => comment.Task)
+            .WithMany(task => task.Comments)
+            .HasForeignKey(comment => comment.TaskId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
