@@ -1,9 +1,11 @@
 using JobTrackr.Api.Middleware;
 using JobTrackr.Api.Swagger;
 using JobTrackr.Application.Auth;
+using JobTrackr.Application.Comments;
 using JobTrackr.Application.Tasks;
 using JobTrackr.Application.Users;
 using JobTrackr.Infrastructure.Auth;
+using JobTrackr.Infrastructure.Comments;
 using JobTrackr.Infrastructure.Persistence;
 using JobTrackr.Infrastructure.Tasks;
 using JobTrackr.Infrastructure.Users;
@@ -47,6 +49,7 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITaskCommentService, TaskCommentService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

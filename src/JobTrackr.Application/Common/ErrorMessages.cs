@@ -23,5 +23,8 @@ namespace JobTrackr.Application.Common
         public const string NewPasswordMismatch = "New password and confirmation do not match.";
         public const string NewPasswordMustBeDifferent =
             "New password must be different from the current password.";
+        public const string CommentContentRequired = "Comment content is required.";
+        public const string CommentContentTooLong =
+            "Comment content cannot exceed 1000 characters.";
     }
 }
