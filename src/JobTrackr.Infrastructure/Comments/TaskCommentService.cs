@@ -56,5 +56,30 @@ namespace JobTrackr.Infrastructure.Comments
                 CreatedAtUtc = comment.CreatedAtUtc
             };
         }
+
+        public async Task<List<TaskCommentResponse>?> GetAllAsync(int taskId, int userId)
+        {
+            var ownsTask = await _dbContext.Tasks.AnyAsync(
+                task => task.Id == taskId && task.UserId == userId);
+
+            if (!ownsTask)
+            {
+                return null;
+            }
+
+            return await _dbContext.TaskComments
+                .Where(comment => comment.TaskId == taskId &&
+                    comment.Task!.UserId == userId)
+                .OrderBy(comment => comment.CreatedAtUtc)
+                .ThenBy(comment => comment.Id)
+                .Select(comment => new TaskCommentResponse
+                {
+                    Id = comment.Id,
+                    TaskId = comment.TaskId,
+                    Content = comment.Content,
+                    CreatedAtUtc = comment.CreatedAtUtc
+                })
+                .ToListAsync();
+        }
     }
 }

@@ -58,6 +58,30 @@ namespace JobTrackr.Api.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll(int taskId)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var response = await _taskCommentService.GetAllAsync(
+                taskId,
+                currentUserId.Value);
+
+            if (response is null)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Not Found",
+                    detail: ErrorMessages.TaskNotFound);
+            }
+
+            return Ok(response);
+        }
         private int? GetCurrentUserId()
         {
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
