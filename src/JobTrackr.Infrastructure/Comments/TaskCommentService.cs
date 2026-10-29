@@ -81,5 +81,23 @@ namespace JobTrackr.Infrastructure.Comments
                 })
                 .ToListAsync();
         }
+
+        public async Task<bool> DeleteAsync(int taskId, int commentId, int userId)
+        {
+            var comment = await _dbContext.TaskComments.FirstOrDefaultAsync(
+                comment => comment.Id == commentId &&
+                    comment.TaskId == taskId &&
+                    comment.Task!.UserId == userId);
+
+            if (comment is null)
+            {
+                return false;
+            }
+
+            _dbContext.TaskComments.Remove(comment);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

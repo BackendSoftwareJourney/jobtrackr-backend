@@ -82,6 +82,32 @@ namespace JobTrackr.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpDelete("{commentId:int}")]
+        public async Task<IActionResult> Delete(int taskId, int commentId)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId is null)
+            {
+                return Unauthorized();
+            }
+
+            var isDeleted = await _taskCommentService.DeleteAsync(
+                taskId,
+                commentId,
+                currentUserId.Value);
+
+            if (!isDeleted)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Not Found",
+                    detail: ErrorMessages.CommentNotFound);
+            }
+
+            return NoContent();
+        }
         private int? GetCurrentUserId()
         {
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -26,5 +26,6 @@ namespace JobTrackr.Application.Common
         public const string CommentContentRequired = "Comment content is required.";
         public const string CommentContentTooLong =
             "Comment content cannot exceed 1000 characters.";
+        public const string CommentNotFound = "Comment not found.";
     }
 }
