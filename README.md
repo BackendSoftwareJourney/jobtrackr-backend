@@ -31,7 +31,7 @@ This phase added:
 - GitHub Actions execution of the complete service and integration test suite
 - runnable PowerShell examples for authentication and task queries
 
-The project has 52 passing automated tests: 48 service tests and four API integration tests.
+The project has 63 passing automated test cases: 57 service cases and six API integration tests.
 
 ## Current Features
 
@@ -54,6 +54,8 @@ The project has 52 passing automated tests: 48 service tests and four API integr
 - JWT-protected task endpoints
 - Authenticated user profile retrieval and update
 - User-owned task creation, listing, retrieval, update, and deletion
+- Authenticated task comment creation, listing, and deletion with parent-task ownership checks
+- Comment content validation, trimming, and stable oldest-first ordering
 - Global exception handling with safe `ProblemDetails` responses
 - Structured `ProblemDetails` responses for known API errors
 - Request DTO validation with field-level errors
@@ -140,6 +142,23 @@ PATCH /api/tasks/{id}/complete
 PATCH /api/tasks/{id}/reopen
 ```
 
+### Task Comments
+
+All comment endpoints require a valid Bearer token and are restricted to the parent task's owner.
+
+```http
+POST /api/tasks/{taskId}/comments
+GET /api/tasks/{taskId}/comments
+DELETE /api/tasks/{taskId}/comments/{commentId}
+```
+
+- Create returns `201 Created` with a comment DTO and a Location header identifying the comment collection.
+- List returns `200 OK`, ordered by CreatedAtUtc and then Id, ascending. An owned task with no comments returns `[]`.
+- Delete returns `204 No Content` with an empty body.
+- Create and list return `404` with `Task not found.` for missing or unowned tasks when request validation succeeds.
+- Delete returns `404` with `Comment not found.` for missing, mismatched, or unowned targets.
+- Missing or invalid authentication returns `401 Unauthorized`.
+
 ### Users
 
 ```http
@@ -187,6 +206,55 @@ The `/api/users/me` endpoints require a valid Bearer token and use the authentic
 - Complete and reopen are idempotent: repeating either request returns the same desired completion state.
 - Missing tasks and tasks owned by another user return `404 Not Found` for ownership-protected operations.
 
+## Task Comment Behavior
+
+Comments belong to one task, and access is checked through the task owner's authenticated user id.
+
+- The request accepts only Content; taskId comes from the route and user identity comes from the JWT.
+- Content must not be empty, whitespace-only, or longer than 1000 characters.
+- Length is checked before trimming; saved content has leading and trailing whitespace removed.
+- Completed tasks may receive comments.
+- Responses contain Id, TaskId, Content, and CreatedAtUtc, without navigation properties.
+- Deleting a comment preserves its parent task and user. Repeating deletion returns `404`.
+- The migration configures cascade deletion from a task to its comments.
+- Comment editing, replies, attachments, and pagination are not implemented.
+
+Example create request for an owned task (replace the ids and token with local values):
+
+```http
+POST /api/tasks/12/comments
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "content": "Waiting for the recruiter to reply."
+}
+```
+
+Example `201 Created` body; generated values vary:
+
+```json
+{
+  "id": 3,
+  "taskId": 12,
+  "content": "Waiting for the recruiter to reply.",
+  "createdAtUtc": "2026-11-01T10:00:00Z"
+}
+```
+
+The Location header identifies `/api/tasks/12/comments`, prefixed by the application's PathBase when configured. GET on that URL returns an array of comment DTOs, or `[]` when the owned task has none.
+
+Delete the comment using:
+
+```http
+DELETE /api/tasks/12/comments/3
+Authorization: Bearer YOUR_TOKEN
+```
+
+Invalid request fields may return automatic `400` validation errors before service ownership checks run. Use a valid body when testing ownership behavior.
+
 ## Current Authorization Limitations
 
 - Legacy user CRUD endpoints are not yet protected by authorization.
@@ -214,11 +282,13 @@ Current database features:
 - EF Core migrations
 - `Users` table
 - `Tasks` table
+- `TaskComments` table with required Content limited to 1000 characters
 - `PasswordHash` column on users
 - nullable `DueDateUtc` column on tasks
 - `Priority` column on tasks
 - foreign key from `Tasks.UserId` to `Users.Id`
 - cascade delete from a user to that user's tasks
+- foreign key and index on `TaskComments.TaskId`, with cascade delete from tasks to comments
 
 ## Configuration
 
@@ -230,7 +300,7 @@ Current database features:
 
 ## Automated Tests
 
-JobTrackr currently has 52 xUnit tests: 48 service tests and four API integration tests.
+JobTrackr currently has 63 passing xUnit test cases: 57 service cases and six API integration tests. Theory data rows count as separate executed cases.
 
 Current test coverage includes:
 
@@ -251,10 +321,17 @@ Current test coverage includes:
 - public health endpoint behavior through the ASP.NET Core HTTP pipeline
 - registration and login through HTTP, including matching user identity and a non-empty login token
 - authenticated task creation, retrieval, update, and deletion through HTTP
+- comment creation, trimmed content persistence, and invalid content rejection
+- comment filtering, stable ordering, and empty-list behavior
+- comment deletion while preserving the parent task and user
+- authenticated comment create/list/delete workflow through HTTP
+- other-user and anonymous access restrictions on comment endpoints
 
-Task and user service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
+Service tests use `Microsoft.EntityFrameworkCore.InMemory`, so they do not connect to SQL Server.
 
-The health, authentication, and task integration tests use `WebApplicationFactory<Program>` to start the API in memory under the Testing environment. They use test-only configuration and do not require a running API, SQL Server, or local User Secrets. The task workflows obtain a real login token and use it against protected create, get, update, and delete endpoints.
+The health, authentication, task, and comment integration tests use `WebApplicationFactory<Program>` to start the API in memory under the Testing environment. They use test-only configuration and do not require a running API, SQL Server, or local User Secrets. Task and comment workflows obtain real login tokens for protected requests.
+
+These tests do not prove SQL Server migration application, foreign-key enforcement, cascade behavior, or SQL translation. Verify those separately against SQL Server.
 
 The current API has also passed a manual regression flow covering health, registration, login, validation, task CRUD and filters, two-user ownership isolation, user CRUD, structured errors, and request logging.
 
@@ -271,7 +348,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build --no-restore
 Expected result:
 
 ```text
-Passed: 52
+Passed: 63
 Failed: 0
 Skipped: 0
 ```
@@ -495,7 +572,7 @@ dotnet test JobTrackr.slnx --configuration Release --no-build
 Expected test result:
 
 ```text
-Passed: 52
+Passed: 63
 Failed: 0
 Skipped: 0
 ```
@@ -630,6 +707,48 @@ Query rules:
 - `sortDirection` accepts `asc` or `desc`.
 - Tasks without a due date appear last when sorting by due date.
 - Every result is restricted to the authenticated user.
+
+### Test Task Comments
+
+Run the authentication example first so `$baseUrl` and `$headers` are available. Keep the API running with the AddTaskComments migration applied. This example creates a disposable task and comment, then deletes only that comment.
+
+```powershell
+$commentTask = Invoke-RestMethod `
+    -Uri "$baseUrl/api/tasks" `
+    -Method Post `
+    -Headers $headers `
+    -ContentType "application/json" `
+    -Body (@{
+        title = "README comment example"
+        priority = "Medium"
+    } | ConvertTo-Json)
+
+$commentsUrl = "$baseUrl/api/tasks/$($commentTask.id)/comments"
+
+$createdComment = Invoke-RestMethod `
+    -Uri $commentsUrl `
+    -Method Post `
+    -Headers $headers `
+    -ContentType "application/json" `
+    -Body (@{ content = "Testing task comments." } | ConvertTo-Json)
+
+$createdComment | Select-Object id, taskId, content, createdAtUtc
+
+Invoke-RestMethod -Uri $commentsUrl -Headers $headers |
+    Select-Object id, content, createdAtUtc
+
+Invoke-RestMethod `
+    -Uri "$commentsUrl/$($createdComment.id)" `
+    -Method Delete `
+    -Headers $headers
+
+# Show the empty JSON array explicitly after deletion.
+$afterDelete = Invoke-WebRequest -Uri $commentsUrl -Headers $headers -UseBasicParsing
+$afterDelete.StatusCode
+$afterDelete.Content
+```
+
+The final request should show `200` and `[]`. An empty PowerShell table can display no rows, so inspect the raw body to confirm the empty list. The example task remains; delete it separately if no longer needed.
 
 Remove the temporary authentication values from the PowerShell session when testing is complete:
 
