@@ -108,6 +108,7 @@ namespace JobTrackr.Api.Controllers
 
             return NoContent();
         }
+
         private int? GetCurrentUserId()
         {
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);

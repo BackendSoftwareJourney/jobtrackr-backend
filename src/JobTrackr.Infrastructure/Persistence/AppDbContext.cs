@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<JobTask> Tasks { get; set; }
 
     public DbSet<TaskComment> TaskComments { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -25,9 +26,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<TaskComment>()
-           .Property(comment => comment.Content)
-           .IsRequired()
-           .HasMaxLength(1000);
+            .Property(comment => comment.Content)
+            .IsRequired()
+            .HasMaxLength(1000);
 
         modelBuilder.Entity<TaskComment>()
             .HasOne(comment => comment.Task)
