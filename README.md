@@ -2,34 +2,28 @@
 
 JobTrackr is a learning-focused .NET 8 Web API project built step by step using production-style backend practices.
 
-The project currently includes users, user-owned tasks, SQL Server persistence, JWT authentication, structured error handling, request logging, health checks, automated service tests, and GitHub Actions CI.
+The project includes users, user-owned tasks and comments, SQL Server persistence, JWT authentication, structured error handling, request logging, health checks, automated service and integration tests, and GitHub Actions CI.
 
 ## Backend Software Journey Book
 
-The first 120 days of the JobTrackr backend journey are available as a 517-page PDF book:
+The first 150 days of the JobTrackr backend journey are available as a PDF book:
 
 [Read or download Backend Software Journey](docs/book/backend-software-journey.pdf)
 
-The book follows the project from initial solution setup through SQL Server persistence, authentication, task ownership, querying, pagination, testing, continuous integration, reliability improvements, and the Month 4 review. The stable filename allows future 150-day and later editions to replace the same repository document without breaking the link.
+The book follows the project from initial solution setup through SQL Server persistence, authentication, task ownership, querying, pagination, and testing. The 150-day edition adds validation, maintainability reviews, and task comments through the Month 5 review.
 
-## Month 4 Milestone
+## Month 5 Milestone
 
-Days 91-120 moved JobTrackr from basic CRUD toward a more predictable and testable backend API.
+Days 121-150 improved validation and maintainability and added private comments on owned tasks.
 
-This phase added:
+This phase covered:
 
-- authenticated task filtering, title search, and stable server-side pagination
-- created-date and due-date sorting, with tasks without due dates ordered last
-- paged responses containing items, page number, page size, total count, and total pages
-- authenticated profile retrieval and updates
-- secure password changes that verify the current password and store a new hash
-- consistent email format, normalization, and duplicate validation
-- stronger task ownership checks across protected operations
-- Swagger JWT authorization and clearer endpoint descriptions
-- optional development seed data and safer database reset documentation
-- HTTP integration tests for health, authentication, and authenticated task workflows
-- GitHub Actions execution of the complete service and integration test suite
-- runnable PowerShell examples for authentication and task queries
+- consistent DTO mapping and validation for due dates, priorities, email, and passwords
+- a review of error responses and controller and service responsibilities
+- a SQL Server migration for task comments, with cascade deletion from the parent task
+- authenticated comment creation, listing, and deletion restricted to the task owner
+- service and HTTP integration tests for comment validation, ordering, deletion, and access restrictions
+- README examples for the comment workflow and a focused code cleanup
 
 The project has 63 passing automated test cases: 57 service cases and six API integration tests.
 
