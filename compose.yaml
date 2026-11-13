@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jobtrackr-api:day156
+    ports:
+      - "127.0.0.1:8156:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SeedData__Enabled: "false"
+      Jwt__Key: "${Jwt__Key:?Set Jwt__Key in this PowerShell window first}"
