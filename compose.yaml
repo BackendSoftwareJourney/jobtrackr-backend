@@ -10,3 +10,18 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       SeedData__Enabled: "false"
       Jwt__Key: "${Jwt__Key:?Set Jwt__Key in this PowerShell window first}"
+      ConnectionStrings__DefaultConnection: 'Server=db,1433;Database=JobTrackrCompose;User ID=sa;Password="${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD first}";Encrypt=True;TrustServerCertificate=True'
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD first}"
+    ports:
+      - "127.0.0.1:14333:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
